@@ -1,0 +1,115 @@
+[
+  {
+    "id": "q1",
+    "text": "Genellikle sosyal bir ortamda kendini rahat hisseder misin?",
+    "options": ["Evet", "Hayır", "Bazen", "Nadiren"],
+    "type": "personality",
+    "image": null
+  },
+  {
+    "id": "q2",
+    "text": "Yeni bir işe başlarken heyecanlanır mısın?",
+    "options": ["Çok", "Biraz", "Hayır", "Korkarım"],
+    "type": "personality",
+    "image": null
+  },
+  {
+    "id": "q3",
+    "text": "Stresli durumlarda genellikle nasıl tepki verirsin?",
+    "options": ["Hemen çözüm ararım", "Kaçmayı tercih ederim", "Başkalarından yardım isterim", "Kendime çekilirim"],
+    "type": "personality",
+    "image": null
+  },
+  {
+    "id": "q4",
+    "text": "Planlı hareket etmek senin için ne kadar önemli?",
+    "options": ["Çok önemli", "Önemli değil", "Duruma bağlı", "Hiç önemli değil"],
+    "type": "personality",
+    "image": null
+  },
+  {
+    "id": "q5",
+    "text": "Bir grupta fikirlerini rahatça ifade eder misin?",
+    "options": ["Evet, her zaman", "Çoğu zaman", "Bazen", "Nadiren"],
+    "type": "personality",
+    "image": null
+  },
+  {
+    "id": "q6",
+    "text": "Zor bir karar vermen gerektiğinde ne yaparsın?",
+    "options": ["Hemen karar veririm", "Düşünürüm ve danışırım", "Kararsız kalırım", "Kaçarım"],
+    "type": "personality",
+    "image": null
+  },
+  {
+    "id": "q7",
+    "text": "Hayatta en çok neye değer verirsin?",
+    "options": ["Aile", "Başarı", "Özgürlük", "Arkadaşlık"],
+    "type": "personality",
+    "image": null
+  },
+  {
+    "id": "q8",
+    "text": "Boş zamanlarında genellikle ne yaparsın?",
+    "options": ["Kitap okurum", "Spor yaparım", "Sosyal aktivitelere katılırım", "Dinlenirim"],
+    "type": "personality",
+    "image": null
+  },
+  {
+    "id": "q9",
+    "text": "Duygularını ifade etmekte zorlanır mısın?",
+    "options": ["Evet, çok", "Bazen", "Hayır", "Genellikle ifade ederim"],
+    "type": "personality",
+    "image": null
+  },
+  {
+    "id": "q10",
+    "text": "Başarıyı nasıl tanımlarsın?",
+    "options": ["Mutluluk", "Para", "Kariyer", "Sağlık"],
+    "type": "personality",
+    "image": null
+  },
+
+  {
+    "id": "q11",
+    "text": "Uzay görseline bakınca ilk hissettiğin nedir?",
+    "options": ["Merak", "Sonsuzluk", "Yalnızlık", "Huzur"],
+    "type": "personality",
+    "image": "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "q12",
+    "text": "Bu sakin orman manzarasında kendini nasıl hissediyorsun?",
+    "options": ["Rahatlamış", "Dingin", "Yalnız", "Canlanmış"],
+    "type": "personality",
+    "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "q13",
+    "text": "Kalabalık ve karmaşık şehir görüntüsüne bakınca ne hissediyorsun?",
+    "options": ["Heyecan", "Stres", "Enerji", "Yorgunluk"],
+    "type": "personality",
+    "image": "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1194&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  },
+  {
+    "id": "q14",
+    "text": "Deniz kıyısındaki bu huzurlu manzaraya bakınca ne düşünüyorsun?",
+    "options": ["Huzur", "Melankoli", "Özgürlük", "Yalnızlık"],
+    "type": "personality",
+    "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "q15",
+    "text": "Fırtınalı gökyüzüne bakınca hangi duygu ağır basıyor?",
+    "options": ["Korku", "Heyecan", "Endişe", "Sakinlik"],
+    "type": "personality",
+    "image": "https://images.unsplash.com/photo-1457528877294-b48235bdaa68?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  },
+  {
+    "id": "q16",
+    "text": "Gün batımındaki bu sıcak renkler sana ne hissettiriyor?",
+    "options": ["Huzur", "Romantizm", "Yalnızlık", "Mutluluk"],
+    "type": "personality",
+    "image": "https://images.unsplash.com/photo-1497493292307-31c376b6e479?auto=format&fit=crop&w=800&q=80"
+  }
+]

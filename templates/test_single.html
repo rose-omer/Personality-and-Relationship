@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kişilik Testi</title>
+  <style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #fff;
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 1rem 2rem;
+    color: #333;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #222;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .question {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1.5rem;
+  }
+  .question p {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+  .question-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  label {
+    display: block;
+    margin-bottom: 0.3rem;
+    cursor: pointer;
+  }
+  input[type="radio"] {
+    margin-right: 0.5rem;
+  }
+  button {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1.1rem;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-weight: bold;
+    box-shadow: 0 5px 10px rgba(76, 175, 80, 0.3);
+  }
+  button:hover {
+    background: #388E3C;
+  }
+  .user-name {
+    font-style: italic;
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #666;
+  }
+</style>
+
+</head>
+<body>
+  <h1>Kişilik Testi {% if user_name %} - {{ user_name }} {% endif %}</h1>
+  {% if user_name %}
+    <p class="user-name">Merhaba, {{ user_name }}! Soruları cevaplayınız.</p>
+  {% endif %}
+  <form method="POST">
+  {% for q in questions %}
+  <div class="question">
+    {% if q.image %}
+      <img src="{{ q.image }}" alt="Soru görseli" class="question-image" />
+    {% endif %}
+    <p>{{ loop.index }}. {{ q.text }}</p>
+    {% for option in q.options %}
+      <label>
+        <input type="radio" name="{{ q.id }}" value="{{ option }}" required />
+        {{ option }}
+      </label>
+    {% endfor %}
+  </div>
+{% endfor %}
+
+
+  <button type="submit">Testi Gönder</button>
+</form>
+
+</body>
+</html>
