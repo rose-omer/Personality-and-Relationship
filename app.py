@@ -78,17 +78,23 @@ def analyze_couple():
     answers2 = session["user2"]["answers"]
 
     prompt = f"""
-Kullanıcı 1 ({session["user1"]["name"]})'nin cevapları: {answers1}
-Kullanıcı 2 ({session["user2"]["name"]})'nin cevapları: {answers2}
+    Kullanıcı 1: {session["user1"]["name"]}
+    Cevapları: {answers1}
 
-Bu iki kullanıcının cevaplarına göre ilişki uyumluluğu analizi yap:
-- Uyum oranı (0-100 arası)
-- Ortak yönler
-- Zıt yönler
-- Genel değerlendirme
+    Kullanıcı 2: {session["user2"]["name"]}
+    Cevapları: {answers2}
 
-Madde madde ve kullanıcı dostu şekilde yanıtla.
-"""
+    Bu iki kişinin cevaplarına göre detaylı bir ilişki uyumluluk analizi yapmanı istiyorum. Analiz şu başlıkları içermeli:
+
+    1. 🔢 **Uyum Skoru:** 0 ile 100 arasında bir oran ver. Sadece sayı değil, bu skoru etkileyen temel benzerlik ve farklılık noktalarını da açıkla.
+    2. 🤝 **Ortak Yönler:** Hangi cevaplarda benzer düşünceler paylaştılar? Bu benzerliklerin ilişki açısından anlamını yorumla.
+    3. ⚖️ **Zıt Yönler:** Farklı yanıt verdikleri soruları değerlendir ve bu farklılıkların ilişki dinamiğini nasıl etkileyebileceğini belirt.
+    4. 🧠 **Duygusal ve Sosyal Uyum:** Empati, iletişim, duygusal zekâ gibi konularda nasıl bir uyum içindeler?
+    5. 💡 **Genel Değerlendirme:** Tüm verileri göz önünde bulundurarak ilişkisel uyum hakkında genel bir analiz yaz. Güçlü ve zayıf yönleri objektif biçimde belirt.
+    6. 📝 **Tavsiye:** Uyumun artırılması ya da çatışmaların azaltılması için kişiselleştirilmiş önerilerde bulun.
+
+    Cevapları kullanıcı dostu, samimi ve açıklayıcı bir dille yaz. Analizlerin yapay zekâdan çıktığı hissedilmesin, bir insanın detaylı değerlendirmesi gibi olsun.
+    """
 
     try:
         response = model.generate_content(prompt)
