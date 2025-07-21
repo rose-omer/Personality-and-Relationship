@@ -1,18 +1,24 @@
 from flask import Flask, render_template, request, redirect, url_for
-import json
 import uuid
 import google.generativeai as genai
+import json
+from datetime import datetime
+import os
+from db import get_db_connection
 
 app = Flask(__name__)
 app.secret_key = 'gizli-anahtar'
 
-GEMINI_API_KEY = "AIzaSyDUwoo_Dr30nqdOYJZb_K7wMZg7tS_GGXM"
+# Gemini API yapılandırması
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
 
+# Soruları yükle
 with open("questions.json", "r", encoding="utf-8") as f:
     QUESTIONS = json.load(f)
 
+# Bellek içi oturumlar
 SESSIONS = {}
 
 @app.route("/")
@@ -23,18 +29,21 @@ def index():
 def test_single():
     if request.method == "POST":
         answers = [request.form.get(q["id"]) for q in QUESTIONS]
-        result = analyze_single(answers)
+        result = analyze_single_ai(answers)
+
+        # Anonim olarak kaydet
+        save_test_result("Anonim", "single", answers, result["yorum"])
+
         return render_template("result.html", result=result)
+
     return render_template("test_single.html", questions=QUESTIONS)
 
 @app.route("/test/couple", methods=["GET"])
 def test_couple_start():
-    # GET isteğinde isim formu gösterilir
     return render_template("start_couple.html")
 
 @app.route("/test/couple", methods=["POST"])
 def test_couple_start_post():
-    # POST isteğinde isimleri alıp session oluştur ve link göster
     name1 = request.form.get("name1").strip()
     name2 = request.form.get("name2").strip()
 
@@ -84,36 +93,116 @@ def analyze_couple():
     Kullanıcı 2: {session["user2"]["name"]}
     Cevapları: {answers2}
 
-    Bu iki kişinin cevaplarına göre detaylı bir ilişki uyumluluk analizi yapmanı istiyorum. Analiz şu başlıkları içermeli:
+    Bu iki kişinin cevaplarına göre detaylı bir ilişki uyumluluk analizi yapmanı istiyorum:
+    - 🔢 Uyum Skoru (%)
+    - 🤝 Ortak Yönler
+    - ⚖️ Zıt Yönler
+    - 🧠 Sosyal & Duygusal Uyum
+    - 💡 Genel Yorum
+    - 📝 Tavsiye
 
-    1. 🔢 **Uyum Skoru:** 0 ile 100 arasında bir oran ver. Sadece sayı değil, bu skoru etkileyen temel benzerlik ve farklılık noktalarını da açıkla.
-    2. 🤝 **Ortak Yönler:** Hangi cevaplarda benzer düşünceler paylaştılar? Bu benzerliklerin ilişki açısından anlamını yorumla.
-    3. ⚖️ **Zıt Yönler:** Farklı yanıt verdikleri soruları değerlendir ve bu farklılıkların ilişki dinamiğini nasıl etkileyebileceğini belirt.
-    4. 🧠 **Duygusal ve Sosyal Uyum:** Empati, iletişim, duygusal zekâ gibi konularda nasıl bir uyum içindeler?
-    5. 💡 **Genel Değerlendirme:** Tüm verileri göz önünde bulundurarak ilişkisel uyum hakkında genel bir analiz yaz. Güçlü ve zayıf yönleri objektif biçimde belirt.
-    6. 📝 **Tavsiye:** Uyumun artırılması ya da çatışmaların azaltılması için kişiselleştirilmiş önerilerde bulun.
-
-    Cevapları kullanıcı dostu, samimi ve açıklayıcı bir dille yaz. Analizlerin yapay zekâdan çıktığı hissedilmesin, bir insanın detaylı değerlendirmesi gibi olsun.
+    Açıklayıcı, samimi ve insan gibi yaz lütfen.
     """
 
     try:
         response = model.generate_content(prompt)
         yorum = response.text
+
+        save_couple_result(
+            session_id,
+            session["user1"]["name"],
+            session["user2"]["name"],
+            answers1,
+            answers2,
+            yorum
+        )
     except Exception as e:
         yorum = f"AI analiz hatası: {str(e)}"
 
     return render_template("result.html", yorum=yorum)
 
-def analyze_single(answers):
-    positive = answers.count("Evet")
-    neutral = answers.count("Biraz")
-    score = int((positive + 0.5 * neutral) / len(answers) * 100)
-    return {
-        "başlık": "Kişilik Analizi",
-        "güçlü_yönler": "Sosyal ve dengeli bir kişiliğe sahipsiniz.",
-        "zayıf_yönler": "Zaman zaman kararsızlık yaşayabilirsiniz.",
-        "puan": f"%{score} uyum"
-    }
+def analyze_single_ai(answers):
+    prompt = f"""
+    Kullanıcı aşağıdaki çoktan seçmeli kişilik testi sorularını cevapladı:
+
+    Cevaplar: {answers}
+
+    Bu cevaplara göre aşağıdaki başlıklarda kişisel bir analiz yapmanı istiyorum:
+    - 💪 Güçlü Yönler
+    - 🧱 Geliştirilebilir Alanlar
+    - 🧠 Genel Kişilik Yorumu
+    - 📊 Uyum Skoru (%)
+
+    Lütfen açıklayıcı, kullanıcı dostu ve kişisel bir dille yaz.
+    """
+
+    try:
+        response = model.generate_content(prompt)
+        return {
+            "başlık": "Kişilik Analizi",
+            "yorum": response.text
+        }
+    except Exception as e:
+        return {
+            "başlık": "Kişilik Analizi",
+            "yorum": f"AI hatası: {str(e)}"
+        }
+
+# 🔽 Veritabanı fonksiyonları
+
+def save_test_result(user_name, test_type, answers, analysis):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            """
+            INSERT INTO test_results (user_name, test_type, answers, analysis)
+            VALUES (%s, %s, %s, %s)
+            """,
+            (user_name, test_type, json.dumps(answers), analysis)
+        )
+        conn.commit()
+        cur.close()
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        print("DB kaydı sırasında hata:", e)
+        raise
+    finally:
+        if conn:
+            conn.close()
+
+def save_couple_result(session_id, user1_name, user2_name, answers1, answers2, analysis):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            """
+            INSERT INTO couple_test_results
+            (session_id, user1_name, user2_name, user1_answers, user2_answers, analysis)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (
+                session_id,
+                user1_name,
+                user2_name,
+                json.dumps(answers1),
+                json.dumps(answers2),
+                analysis
+            )
+        )
+        conn.commit()
+        cur.close()
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        print("Couple testi DB hatası:", e)
+        raise
+    finally:
+        if conn:
+            conn.close()
 
 if __name__ == "__main__":
     app.run(debug=True)
