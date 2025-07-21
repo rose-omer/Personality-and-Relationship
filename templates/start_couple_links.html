@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>İkili Test Linkleri</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9fafb;
+      padding: 3rem 1rem;
+      max-width: 600px;
+      margin: auto;
+      color: #333;
+    }
+    h1 {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+    a.link {
+      display: inline-block;
+      background: #2196F3;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 3px 8px rgba(33, 150, 243, 0.4);
+      transition: background 0.3s ease;
+    }
+    a.link:hover {
+      background: #1565C0;
+    }
+  </style>
+</head>
+<body>
+  <h1>İkili Test Linkleri</h1>
+  <p>{{ name1 }} için: <a href="{{ link1 }}" class="link" target="_blank">Test Linki</a></p>
+  <p>{{ name2 }} için: <a href="{{ link2 }}" class="link" target="_blank">Test Linki</a></p>
+</body>
+</html>
