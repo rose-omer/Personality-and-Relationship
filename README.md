@@ -1,5 +1,8 @@
 # 🧠 AI Destekli Görselli Kişilik & İlişki Testi
 [🔗 Uygulamayı hemen deneyin](https://personality-and-relationship.onrender.com)
+
+
+
 Bu proje, kullanıcıların kişilik özelliklerini ve çiftlerin ilişkisel uyumlarını analiz eden yapay zeka destekli bir test uygulamasıdır. Flask altyapısı üzerine kurulmuş olan bu sistem, Google Gemini API kullanarak analizler yapar ve sonucu kullanıcıya sunar.
 
 Testler iki modda çalışır:
