@@ -71,13 +71,13 @@ Projeyi bir GitHub reposu olarak paylaşın. Aşağıdaki dosyaların eksiksiz o
 👉 https://makersuite.google.com/app/apikey
 
 
-##👨‍💻 Geliştirici Notları
+## 👨‍💻 Geliştirici Notları
 - Proje sade, modüler ve genişletilebilir şekilde tasarlanmıştır.
 
 - Görseller Unsplash üzerinden alınmıştır, telif haklarına dikkat edilmelidir.
 
 - questions.json dosyasına yeni sorular ekleyerek sistemi kolayca büyütebilirsiniz.
 
-##🧠 Yapay Zeka Modeli
+## 🧠 Yapay Zeka Modeli
 - Proje, Google'ın Gemini-Pro modelini kullanmaktadır. API üzerinden doğal dilde analiz yapar ve sonuçları kullanıcı dostu şekilde sunar.
 
