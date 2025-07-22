@@ -1,6 +1,6 @@
 # 🧠 AI Destekli Görselli Kişilik & İlişki Testi
 [🔗 Uygulamayı hemen deneyin](https://personality-and-relationship.onrender.com)
-📌 EMAR Yapay Zeka Staj Projesi
+## 📌 EMAR Yapay Zeka Staj Projesi
 
 Bu proje, Emar bünyesindeki staj sürecim boyunca geliştirdiğim yenilikçi bir yapay zekâ uygulamasıdır. Staj süresi boyunca Python (Flask), yapay zekâ API entegrasyonları ve modern web teknolojileri üzerinde pratik çalışmalar gerçekleştirdim. Özellikle kullanıcı etkileşimli testler tasarlayarak, verilerin anlamlı çıktılara dönüştürülmesini sağlayan sistemler geliştirdim. Geliştirme süreci boyunca yazılım mimarisi, kullanıcı deneyimi ve veri analitiği konularında derinlemesine bilgi sahibi oldum.
 
