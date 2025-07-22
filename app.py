@@ -71,7 +71,7 @@ def test_couple_user(session_id, user):
         if session["user1"]["answers"] and session["user2"]["answers"]:
             return redirect(url_for("analyze_couple", session_id=session_id))
         else:
-            return render_template("wait.html", name=session[user]["name"])
+            return render_template("wait.html", name=session[user]["name"], session_id=session_id)
 
     return render_template("test_single.html", questions=QUESTIONS, user_name=session[user]["name"])
 
@@ -108,6 +108,10 @@ def analyze_couple():
         response = model.generate_content(prompt)
         yorum = response.text
 
+        # 🔽 ANALİZ SONUCUNU BELLEĞE YAZ
+        session["yorum"] = yorum
+
+        # 🔽 VERİTABANINA KAYDET
         save_couple_result(
             session_id,
             session["user1"]["name"],
@@ -120,6 +124,7 @@ def analyze_couple():
         yorum = f"AI analiz hatası: {str(e)}"
 
     return render_template("result.html", yorum=yorum)
+
 
 def analyze_single_ai(answers):
     prompt = f"""
@@ -203,6 +208,13 @@ def save_couple_result(session_id, user1_name, user2_name, answers1, answers2, a
     finally:
         if conn:
             conn.close()
+@app.route("/api/check_analysis/<session_id>")
+def check_analysis(session_id):
+    session = SESSIONS.get(session_id)
+    if session and "yorum" in session:
+        return {"analiz": session["yorum"]}
+    return {"analiz": None}
+
 
 if __name__ == "__main__":
     app.run(debug=True)
