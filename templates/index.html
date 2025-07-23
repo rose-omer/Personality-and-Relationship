@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test Seçimi</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 1.5rem;
+    }
+    .btn-container {
+      display: flex;
+      gap: 1.5rem;
+    }
+    a.button {
+      text-decoration: none;
+      padding: 1rem 2rem;
+      background: #4CAF50;
+      color: white;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+      box-shadow: 0 4px 8px rgb(76 175 80 / 0.3);
+    }
+    a.button:hover {
+      background: #388E3C;
+      box-shadow: 0 6px 12px rgb(56 142 60 / 0.5);
+    }
+  </style>
+</head>
+<body>
+  <h1>Kişilik ve İlişki Testi</h1>
+  <div class="btn-container">
+    <a href="/test/single" class="button">Tekli Kişilik Testi</a>
+    <a href="/test/couple" class="button">İkili İlişki Testi</a>
+  </div>
+</body>
+</html>

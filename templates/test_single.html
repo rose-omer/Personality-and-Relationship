@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kişilik Testi</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f7f8;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      color: #333;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #2c3e50;
+    }
+
+    .user-name {
+      font-style: italic;
+      font-size: 1rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #555;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .question {
+      background-color: #ffffff;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+    }
+
+    .question p {
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    .question-image {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 5px;
+      transition: background 0.2s ease;
+    }
+
+    label:hover {
+      background-color: #eaeaea;
+    }
+
+    input[type="radio"] {
+      margin-right: 0.5rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      font-size: 1.1rem;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      font-weight: bold;
+      box-shadow: 0 5px 10px rgba(52, 152, 219, 0.3);
+    }
+
+    button:hover {
+      background: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kişilik Testi</h1>
+
+  <!-- 👇 İsim giriş alanı: yalnızca user_name yoksa gösterilir -->
+  {% if not user_name %}
+  <form method="POST">
+    <div class="question">
+      <p>İsminizi giriniz:</p>
+      <input type="text" name="username" placeholder="Adınız" required
+        style="padding: 0.6rem; font-size: 1rem; width: 100%; border-radius: 6px; border: 1px solid #ccc;" />
+    </div>
+    <button type="submit">Teste Başla</button>
+  </form>
+  {% else %}
+
+  <!-- Test formu (sadece isim alındıktan sonra gösterilir) -->
+  <p class="user-name">Merhaba, {{ user_name }}! Lütfen aşağıdaki soruları cevaplayınız.</p>
+
+  <form method="POST">
+    {% for q in questions %}
+      <div class="question">
+        {% if q.image %}
+          <img src="{{ q.image }}" alt="Soru görseli" class="question-image" />
+        {% endif %}
+        <p>{{ loop.index }}. {{ q.text }}</p>
+        {% for option in q.options %}
+          <label>
+            <input type="radio" name="{{ q.id }}" value="{{ option }}" required />
+            {{ option }}
+          </label>
+        {% endfor %}
+      </div>
+    {% endfor %}
+    <input type="hidden" name="username" value="{{ user_name }}" />
+    <button type="submit">Testi Gönder</button>
+  </form>
+  {% endif %}
+</body>
+</html>
