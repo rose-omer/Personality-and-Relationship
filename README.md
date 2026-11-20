@@ -8,6 +8,21 @@
 Canlı demo: https://personality-and-relationship.onrender.com
 İlk açılış yaklaşık 1 dakika sürebilir (Render Free servisi 15 dakika trafiksizlikte uyur).
 
+## Ekran görüntüleri
+
+Görüntüler AI_FAKE=1 ile alındı. Sonuç metni uygulamanın sabit örnek analizidir.
+
+| | |
+|---|---|
+| ![Ana sayfa](docs/ekran/1-ana-sayfa.png)<br>Ana sayfa | ![Soru ekranı](docs/ekran/2-soru.png)<br>Soru ekranı |
+| ![Sonuç](docs/ekran/3-sonuc.png)<br>Sonuç | ![Sonuç, tam sayfa](docs/ekran/4-sonuc-tam.png)<br>Sonuç, tam sayfa |
+
+## Kullanım
+
+![Kullanım akışı](docs/ekran/kullanim.gif)
+
+16 soru cevaplanır; sonuç dört eksende ve paylaşılabilir bir kartta gösterilir.
+
 ## Mimari
 
 ```
