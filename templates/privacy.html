@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Gizlilik ve aydınlatma metni · Kişilik ve İlişki{% endblock %}
+{% block content %}
+<article class="prose">
+  <h1>Gizlilik ve aydınlatma metni</h1>
+  <p class="lead mt-4">Bu sayfa, testte hangi veriyi hangi amaçla işlediğimizi ve ne kadar sakladığımızı anlatır. 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında hazırlanmıştır.</p>
+
+  <h2>Veri sorumlusu</h2>
+  <p>Bu uygulama bireysel bir portföy projesidir. İletişim için projenin <a href="https://github.com/rose-omer/Personality-and-Relationship">GitHub sayfasını</a> kullanabilirsin.</p>
+
+  <h2>Hangi veriyi işliyoruz?</h2>
+  <ul>
+    <li><strong>Takma ad:</strong> İsteğe bağlıdır. Tekli testte yalnız "kartta görünsün" seçeneğini işaretlersen saklanır. Çift testinde iki takma ad bağlantıları ayırmak için saklanır.</li>
+    <li><strong>Test cevapları:</strong> 16 sorudaki seçimlerin.</li>
+    <li><strong>Analiz sonucu:</strong> Yapay zekânın ürettiği kişilik ya da uyum yorumu.</li>
+  </ul>
+  <p>IP adresini veritabanına yazmıyoruz. Kötüye kullanımı sınırlamak için IP adresin yalnız sunucu belleğinde, en çok bir gün tutulur ve sunucu yeniden başlayınca silinir.</p>
+
+  <h2>Hangi amaçla?</h2>
+  <p>Verileri yalnız sana ve, çift testinde, partnerine sonuç göstermek için işliyoruz. Reklam, profil çıkarma ya da üçüncü kişiye satış yok.</p>
+
+  <h2>Yurt dışına aktarım</h2>
+  <p>Analiz için cevapların ve takma adın Google'ın Gemini API hizmetine gönderilir. Bu hizmetin sunucuları Türkiye dışındadır. Onay kutusunu işaretleyerek bu aktarıma açık rıza verirsin. Onay vermezsen test başlamaz.</p>
+
+  <h2>Ne kadar saklıyoruz?</h2>
+  <ul>
+    <li>Tekli test sonuçları: 30 gün.</li>
+    <li>Çift testi oturumları ve sonuçları: 7 gün.</li>
+  </ul>
+  <p>Süresi dolan kayıtlar, bir sonuç sayfası açıldığında kendiliğinden silinir.</p>
+
+  <h2>Haklarına nasıl ulaşırsın?</h2>
+  <p>Sonuç sayfasındaki "Sonucumu sil" düğmesi kaydı hemen ve kalıcı olarak siler. Düğme, sonucu oluşturduğun tarayıcıda görünür. KVKK'nın 11. maddesindeki diğer hakların (bilgi alma, düzeltme, itiraz) için GitHub sayfasından yazabilirsin.</p>
+
+  <h2>Çerezler</h2>
+  <p>Yalnız bir oturum çerezi kullanıyoruz: form güvenlik kodu ve "sonucu sen oluşturdun" bilgisi için. Tema seçimin tarayıcında yerel olarak tutulur. Takip ya da reklam çerezi yok.</p>
+</article>
+{% endblock %}

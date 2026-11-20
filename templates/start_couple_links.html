@@ -1,45 +1,26 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>İkili Test Linkleri</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f9fafb;
-      padding: 3rem 1rem;
-      max-width: 600px;
-      margin: auto;
-      color: #333;
-    }
-    h1 {
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-    p {
-      font-size: 1.1rem;
-      margin-bottom: 1.5rem;
-    }
-    a.link {
-      display: inline-block;
-      background: #2196F3;
-      color: white;
-      padding: 0.5rem 1.25rem;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: 600;
-      box-shadow: 0 3px 8px rgba(33, 150, 243, 0.4);
-      transition: background 0.3s ease;
-    }
-    a.link:hover {
-      background: #1565C0;
-    }
-  </style>
-</head>
-<body>
-  <h1>İkili Test Linkleri</h1>
-  <p>{{ name1 }} için: <a href="{{ link1 }}" class="link" target="_blank">Test Linki</a></p>
-  <p>{{ name2 }} için: <a href="{{ link2 }}" class="link" target="_blank">Test Linki</a></p>
-</body>
-</html>
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Test bağlantıları · Kişilik ve İlişki{% endblock %}
+{% block body_class %}theme-couple{% endblock %}
+{% block content %}
+<div class="page">
+  <h1>Bağlantılar hazır</h1>
+  <p class="lead">Her kişi yalnız kendi bağlantısını açsın. Bağlantılar 7 gün geçerli; bu sayfayı kapatmadan önce ikisini de kaydet.</p>
+
+  <div class="link-list">
+    {% for user, name in [("user1", name1), ("user2", name2)] %}
+    <section class="link-card" aria-labelledby="{{ user }}-title">
+      <h2 id="{{ user }}-title">{{ name }}{% if loop.first %} (sen){% endif %}</h2>
+      <label class="visually-hidden" for="{{ user }}-link">{{ name }} için test bağlantısı</label>
+      <input class="input" id="{{ user }}-link" value="{{ links[user] }}" readonly>
+      <div class="btn-row">
+        <button class="btn" type="button" data-copy="{{ links[user] }}" data-input="{{ user }}-link" data-status="{{ user }}-status">{{ icon("copy") }}<span>Bağlantıyı kopyala</span></button>
+        <button class="btn share-only" type="button" data-share="{{ links[user] }}" data-title="Birlikte keşfet: {{ name }} için test">{{ icon("share") }}<span>Paylaş</span></button>
+        {% if loop.first %}<a class="btn btn--primary" href="{{ links[user] }}">Testimi şimdi çöz</a>{% endif %}
+      </div>
+      <p class="copy-status" id="{{ user }}-status" role="status"></p>
+    </section>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

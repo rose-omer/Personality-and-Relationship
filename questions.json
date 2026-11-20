@@ -75,41 +75,47 @@
     "text": "Uzay görseline bakınca ilk hissettiğin nedir?",
     "options": ["Merak", "Sonsuzluk", "Yalnızlık", "Huzur"],
     "type": "personality",
-    "image": "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=800&q=80"
+    "image": "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=800&q=80",
+    "alt": "Renkli bir bulutsu ve yıldızlarla dolu uzay görüntüsü"
   },
   {
     "id": "q12",
     "text": "Bu sakin orman manzarasında kendini nasıl hissediyorsun?",
     "options": ["Rahatlamış", "Dingin", "Yalnız", "Canlanmış"],
     "type": "personality",
-    "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+    "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
+    "alt": "Sakin bir orman manzarası"
   },
   {
     "id": "q13",
     "text": "Kalabalık ve karmaşık şehir görüntüsüne bakınca ne hissediyorsun?",
     "options": ["Heyecan", "Stres", "Enerji", "Yorgunluk"],
     "type": "personality",
-    "image": "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1194&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    "image": "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80",
+    "alt": "Kalabalık ve karmaşık bir şehir görüntüsü"
   },
   {
     "id": "q14",
     "text": "Deniz kıyısındaki bu huzurlu manzaraya bakınca ne düşünüyorsun?",
     "options": ["Huzur", "Melankoli", "Özgürlük", "Yalnızlık"],
     "type": "personality",
-    "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"
+    "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+    "alt": "Huzurlu bir deniz kıyısı manzarası"
   },
   {
     "id": "q15",
     "text": "Fırtınalı gökyüzüne bakınca hangi duygu ağır basıyor?",
     "options": ["Korku", "Heyecan", "Endişe", "Sakinlik"],
     "type": "personality",
-    "image": "https://images.unsplash.com/photo-1457528877294-b48235bdaa68?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    "image": "https://images.unsplash.com/photo-1457528877294-b48235bdaa68?auto=format&fit=crop&w=800&q=80",
+    "alt": "Fırtınalı bir gökyüzü"
   },
   {
     "id": "q16",
     "text": "Gün batımındaki bu sıcak renkler sana ne hissettiriyor?",
     "options": ["Huzur", "Romantizm", "Yalnızlık", "Mutluluk"],
     "type": "personality",
-    "image": "https://images.unsplash.com/photo-1497493292307-31c376b6e479?auto=format&fit=crop&w=800&q=80"
+    "image": "https://images.unsplash.com/photo-1497493292307-31c376b6e479?auto=format&fit=crop&w=800&q=80",
+    "alt": "Gün batımında sıcak renkli bir gökyüzü"
   }
 ]

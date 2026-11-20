@@ -1,49 +1,63 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Test Seçimi</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f9f9f9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    h1 {
-      color: #333;
-      margin-bottom: 1.5rem;
-    }
-    .btn-container {
-      display: flex;
-      gap: 1.5rem;
-    }
-    a.button {
-      text-decoration: none;
-      padding: 1rem 2rem;
-      background: #4CAF50;
-      color: white;
-      border-radius: 6px;
-      font-weight: bold;
-      transition: background 0.3s ease;
-      box-shadow: 0 4px 8px rgb(76 175 80 / 0.3);
-    }
-    a.button:hover {
-      background: #388E3C;
-      box-shadow: 0 6px 12px rgb(56 142 60 / 0.5);
-    }
-  </style>
-</head>
-<body>
-  <h1>Kişilik ve İlişki Testi</h1>
-  <div class="btn-container">
-    <a href="/test/single" class="button">Tekli Kişilik Testi</a>
-    <a href="/test/couple" class="button">İkili İlişki Testi</a>
-  </div>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<section class="home-intro" aria-labelledby="baslik">
+  <h1 id="baslik">Kendini ve ilişkini 16 soruda tanı.</h1>
+  <p class="lead">Cevaplarını Google Gemini yorumlar; sonuç dört eksenli bir kartla gelir. Kayıt yok, takma ad isteğe bağlı.</p>
+  <p class="cold-start" data-cold-start hidden>Sunucu uykudaydı; ilk açılış bu yüzden uzun sürdü (1 dakikayı bulabilir). Sonraki adımlar hızlı.</p>
+</section>
+
+<div class="paths">
+  <a class="path" href="{{ url_for('main.test_single') }}">
+    <div>
+      <h2 class="path__title">Kendini tanı</h2>
+      <p class="path__meta">Tek kişilik, yaklaşık 3 dakika</p>
+    </div>
+    <div class="path__preview" aria-hidden="true">
+      <ul class="spectrum">
+        <li class="spectrum__row">
+          <span class="spectrum__label">Planlılık</span>
+          <div class="spectrum__track">
+            <svg><line class="spectrum__line" x1="0" y1="10" x2="100%" y2="10"/><circle class="spectrum__dot" cx="68%" cy="10" r="8"/></svg>
+          </div>
+          <span class="spectrum__poles"><span>Akışına bırakan</span><span>Önceden planlayan</span></span>
+        </li>
+      </ul>
+    </div>
+    <span class="path__cta">Teste başla {{ icon("next") }}</span>
+  </a>
+
+  <a class="path path--couple" href="{{ url_for('main.test_couple_start') }}">
+    <div>
+      <h2 class="path__title">Birlikte keşfet</h2>
+      <p class="path__meta">İki kişilik; her biriniz kendi bağlantısından çözer</p>
+    </div>
+    <div class="path__preview" aria-hidden="true">
+      <svg class="ring ring--small" viewBox="0 0 120 120">
+        <circle class="ring__track" cx="60" cy="60" r="52"/>
+        <circle class="ring__value" cx="60" cy="60" r="52" stroke-dasharray="326.73" stroke-dashoffset="91.48" transform="rotate(-90 60 60)"/>
+        <text class="ring__text" x="60" y="70" text-anchor="middle">%72</text>
+      </svg>
+      <p class="path__preview-caption">Uyum skoru, ortak yönleriniz, farklarınız ve bir iletişim önerisi.</p>
+    </div>
+    <span class="path__cta">Bağlantıları oluştur {{ icon("next") }}</span>
+  </a>
+</div>
+
+<section class="steps" aria-labelledby="nasil">
+  <h2 id="nasil">Nasıl çalışır?</h2>
+  <ol>
+    <li>
+      <h3>Soruları cevapla</h3>
+      <p>Her ekranda bir soru. Altısı bir fotoğrafa verdiğin ilk tepkiyi soruyor.</p>
+    </li>
+    <li>
+      <h3>Gemini yorumlar</h3>
+      <p>Soru ve cevaplar Google Gemini API'sine gider; analiz 5–20 saniye sürer.</p>
+    </li>
+    <li>
+      <h3>Kartını paylaş ya da sil</h3>
+      <p>Sonuç 30 gün saklanır. İstediğin an tek tıkla silebilirsin. <a href="{{ url_for('main.privacy') }}">Gizlilik</a></p>
+    </li>
+  </ol>
+</section>
+{% endblock %}

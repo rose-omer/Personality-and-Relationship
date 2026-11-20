@@ -1,0 +1,18 @@
+# Render Blueprint. Yalnız ayar dosyası; deploy bu dosyadan elle başlatılır.
+services:
+  - type: web
+    name: personality-and-relationship
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn "app:create_app()" --workers 1 --threads 4 --timeout 60
+    healthCheckPath: /saglik
+    envVars:
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+      - key: SECRET_KEY
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false

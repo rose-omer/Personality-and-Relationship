@@ -1,134 +1,105 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kişilik Testi</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4f7f8;
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 2rem;
-      color: #333;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ "Çift testi" if mode == "couple" else "Kişilik testi" }} · Kişilik ve İlişki{% endblock %}
+{% block body_class %}{{ "theme-couple" if mode == "couple" else "" }}{% endblock %}
+{% block content %}
+<div class="quiz" data-quiz>
+  <div class="quiz__bar">
+    <button class="btn btn--quiet" type="button" data-back hidden>{{ icon("back") }}<span>Geri</span></button>
+    <progress max="{{ questions|length }}" value="0" aria-label="İlerleme"></progress>
+    <span class="quiz__count" data-count aria-hidden="true"></span>
+  </div>
 
-    h1 {
-      text-align: center;
-      margin-bottom: 1.5rem;
-      color: #2c3e50;
-    }
+  <form class="quiz__form" method="post" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-    .user-name {
-      font-style: italic;
-      font-size: 1rem;
-      text-align: center;
-      margin-bottom: 2rem;
-      color: #555;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-
-    .question {
-      background-color: #ffffff;
-      padding: 1.5rem;
-      border-radius: 10px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.05);
-    }
-
-    .question p {
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      font-size: 1.1rem;
-    }
-
-    .question-image {
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-      margin-bottom: 1rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      cursor: pointer;
-      padding: 0.4rem;
-      border-radius: 5px;
-      transition: background 0.2s ease;
-    }
-
-    label:hover {
-      background-color: #eaeaea;
-    }
-
-    input[type="radio"] {
-      margin-right: 0.5rem;
-    }
-
-    button {
-      width: 100%;
-      padding: 0.8rem;
-      font-size: 1.1rem;
-      background: #3498db;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      font-weight: bold;
-      box-shadow: 0 5px 10px rgba(52, 152, 219, 0.3);
-    }
-
-    button:hover {
-      background: #2980b9;
-    }
-  </style>
-</head>
-<body>
-  <h1>Kişilik Testi</h1>
-
-  <!-- 👇 İsim giriş alanı: yalnızca user_name yoksa gösterilir -->
-  {% if not user_name %}
-  <form method="POST">
-    <div class="question">
-      <p>İsminizi giriniz:</p>
-      <input type="text" name="username" placeholder="Adınız" required
-        style="padding: 0.6rem; font-size: 1rem; width: 100%; border-radius: 6px; border: 1px solid #ccc;" />
+    {% if errors %}
+    <div class="error-summary" role="alert" tabindex="-1">
+      <h2>Formu göndermeden önce şunları tamamla</h2>
+      <ul>
+        {% if errors.onay %}<li><a href="#onay">{{ errors.onay }}</a></li>{% endif %}
+        {% set missing = errors|length - (1 if errors.onay else 0) %}
+        {% if missing %}<li>{{ missing }} soru cevapsız kaldı.</li>{% endif %}
+      </ul>
     </div>
-    <button type="submit">Teste Başla</button>
-  </form>
-  {% else %}
+    {% endif %}
 
-  <!-- Test formu (sadece isim alındıktan sonra gösterilir) -->
-  <p class="user-name">Merhaba, {{ user_name }}! Lütfen aşağıdaki soruları cevaplayınız.</p>
+    <section class="step intro stack" data-step aria-labelledby="giris-baslik">
+      {% if mode == "couple" %}
+        <h1 id="giris-baslik" tabindex="-1" data-step-focus>Merhaba {{ nickname }}</h1>
+        <p class="lead">{{ partner }} ile aynı 16 soruyu cevaplayacaksın. İkiniz de bitirince uyum analizi açılır.</p>
+      {% else %}
+        <h1 id="giris-baslik" tabindex="-1" data-step-focus>Başlamadan önce</h1>
+        <p class="lead">16 soru, yaklaşık 3 dakika. Doğru ya da yanlış cevap yok; ilk aklına geleni seç.</p>
+        <div class="field">
+          <label for="username">Takma ad <span class="muted">(isteğe bağlı)</span></label>
+          <input class="input" id="username" name="username" maxlength="40" autocomplete="nickname" value="{{ nickname or '' }}" aria-describedby="username-hint">
+          <p class="field__hint" id="username-hint">Gerçek adını yazman gerekmiyor. En çok 40 karakter.</p>
+        </div>
+        <label class="checkbox">
+          <input type="checkbox" name="karta_ekle" value="1" {% if selected.karta_ekle %}checked{% endif %}>
+          <span>Takma adım sonuç kartında görünsün</span>
+        </label>
+      {% endif %}
 
-  <form method="POST">
+      <div class="disclosure">
+        <strong>Kısa aydınlatma</strong>
+        <ul>
+          <li>Cevapların{% if mode != "couple" %} ve takma adın{% endif %} analiz için Google Gemini API'sine (yurt dışı) gönderilir.</li>
+          <li>Sonuç 30 gün, çift oturumu 7 gün saklanır; sonra kendiliğinden silinir.</li>
+          <li>IP adresin veritabanına yazılmaz.</li>
+        </ul>
+        <p class="small"><a href="{{ url_for('main.privacy') }}">Aydınlatma metninin tamamı</a></p>
+      </div>
+
+      <div {% if errors.onay %}data-has-error{% endif %}>
+        <label class="checkbox">
+          <input type="checkbox" id="onay" name="onay" value="1" required {% if selected.onay %}checked{% endif %} {% if errors.onay %}aria-invalid="true" aria-describedby="onay-error"{% endif %}>
+          <span>Aydınlatma metnini okudum; cevaplarımın bu amaçla işlenmesini onaylıyorum.</span>
+        </label>
+        {% if errors.onay %}<p class="field-error" id="onay-error">{{ icon("alert") }}<span>{{ errors.onay }}</span></p>{% endif %}
+      </div>
+    </section>
+
     {% for q in questions %}
-      <div class="question">
-        {% if q.image %}
-          <img src="{{ q.image }}" alt="Soru görseli" class="question-image" />
-        {% endif %}
-        <p>{{ loop.index }}. {{ q.text }}</p>
+    <fieldset class="step question" data-step {% if errors[q.id] %}data-has-error aria-describedby="{{ q.id }}-error"{% endif %}>
+      {% if q.image %}
+        <img class="question__image" src="{{ q.image }}" alt="{{ q.alt or '' }}" width="800" height="533" loading="lazy" decoding="async">
+      {% endif %}
+      <legend tabindex="-1" data-step-focus>
+        <span class="question__index">Soru {{ loop.index }} / {{ questions|length }}</span>
+        {{ q.text }}
+      </legend>
+      <div class="options">
         {% for option in q.options %}
-          <label>
-            <input type="radio" name="{{ q.id }}" value="{{ option }}" required />
-            {{ option }}
-          </label>
+        <label class="option">
+          <input type="radio" name="{{ q.id }}" value="{{ option }}" required {% if selected.get(q.id) == option %}checked{% endif %}>
+          <span class="option__mark" aria-hidden="true"></span>
+          <span>{{ option }}</span>
+        </label>
         {% endfor %}
       </div>
+      {% if errors[q.id] %}<p class="field-error" id="{{ q.id }}-error">{{ icon("alert") }}<span>{{ errors[q.id] }}</span></p>{% endif %}
+    </fieldset>
     {% endfor %}
-    <input type="hidden" name="username" value="{{ user_name }}" />
-    <button type="submit">Testi Gönder</button>
+
+    <div class="quiz__nav">
+      <button class="btn btn--primary" type="button" data-next><span>İleri</span>{{ icon("next") }}</button>
+    </div>
+    <div class="quiz__submit">
+      <button class="btn btn--primary" type="submit"><span>{{ "Cevaplarımı gönder" if mode == "couple" else "Sonucumu göster" }}</span></button>
+    </div>
   </form>
-  {% endif %}
-</body>
-</html>
+
+  <div class="analyzing" role="status" aria-live="polite">
+    {% if mode == "couple" %}
+    <h1 tabindex="-1" data-analyzing-focus>Cevapların kaydediliyor</h1>
+    <p class="lead">{{ partner }} da bitirdiyse analiz hemen başlar ve 5–20 saniye sürer. Sayfayı kapatma.</p>
+    {% else %}
+    <h1 tabindex="-1" data-analyzing-focus>Analiz hazırlanıyor</h1>
+    <p class="lead">Gemini cevaplarını okuyor. Bu genelde 5–20 saniye sürer; sayfayı kapatma.</p>
+    {% endif %}
+    <div class="skeleton" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  </div>
+</div>
+{% endblock %}

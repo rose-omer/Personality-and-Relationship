@@ -1,92 +1,135 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Test Sonucu</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #fafafa;
-      max-width: 700px;
-      margin: 2rem auto;
-      padding: 1.5rem 2rem;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgb(0 0 0 / 0.1);
-      color: #333;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 2rem;
-      color: #222;
-    }
-    .section {
-      margin-bottom: 1.5rem;
-    }
-    .section h3 {
-      margin-bottom: 0.5rem;
-      color: #4CAF50;
-      border-bottom: 2px solid #4CAF50;
-      padding-bottom: 0.3rem;
-    }
-    pre {
-      white-space: pre-wrap;
-      font-size: 1rem;
-      line-height: 1.5;
-      background: #f1f1f1;
-      padding: 1rem;
-      border-radius: 8px;
-      overflow-x: auto;
-    }
-    .back-btn {
-      display: block;
-      margin: 2rem auto 0;
-      padding: 0.8rem 2rem;
-      text-align: center;
-      background: #4CAF50;
-      color: white;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-      width: fit-content;
-      box-shadow: 0 5px 10px rgba(76,175,80,0.3);
-      transition: background 0.3s ease;
-    }
-    .back-btn:hover {
-      background: #388E3C;
-    }
-  </style>
-</head>
-<body>
-  {% if result %}
-    <h1>{{ result.başlık }}</h1>
-
-    {% if result.yorum and not (result.güçlü_yönler or result.zayıf_yönler or result.puan) %}
-      <!-- Eğer sadece yorum varsa (AI tek metin analizi) -->
-      <pre>{{ result.yorum }}</pre>
-    {% else %}
-      <!-- Eğer klasik alanlar varsa -->
-      <div class="section">
-        <h3>Güçlü Yönler</h3>
-        <p>{{ result.güçlü_yönler }}</p>
-      </div>
-      <div class="section">
-        <h3>Zayıf Yönler</h3>
-        <p>{{ result.zayıf_yönler }}</p>
-      </div>
-      <div class="section">
-        <h3>Uyum Puanı</h3>
-        <p>{{ result.puan }}</p>
-      </div>
-    {% endif %}
-
-  {% elif yorum %}
-    <!-- couple analiz için yapay zekadan gelen tek metin -->
-    <h1>Analiz Sonucu</h1>
-    <pre>{{ yorum }}</pre>
-  {% else %}
-    <h1>Sonuç bulunamadı</h1>
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{%- if kind == "couple" -%}
+  {%- set page_title = "İlişki uyumu: %" ~ result.uyum_skoru -%}
+{%- else -%}
+  {%- set page_title = result.tip_adi -%}
+{%- endif -%}
+{% block title %}{{ page_title }} · Kişilik ve İlişki{% endblock %}
+{% block description %}{{ result.ozet|truncate(160) }}{% endblock %}
+{% block meta %}
+  {% if share_id %}
+  {% set page_url = url_for("main.shared_result", share_id=share_id, _external=True) %}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Kişilik ve İlişki Testi">
+  <meta property="og:title" content="{{ page_title }}">
+  <meta property="og:description" content="{{ result.ozet|truncate(200) }}">
+  <meta property="og:url" content="{{ page_url }}">
+  <meta property="og:image" content="{{ url_for('main.shared_image', share_id=share_id, _external=True) }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="{{ page_url }}">
   {% endif %}
-  <a href="/" class="back-btn">Ana Sayfaya Dön</a>
-</body>
-</html>
+  <meta name="robots" content="noindex">
+{% endblock %}
+{% block body_class %}{{ "theme-couple" if kind == "couple" else "" }}{% endblock %}
+{% block footer_note %}Kişilik ve İlişki Testi{% endblock %}
+{% block content %}
+<article class="result" aria-labelledby="sonuc-baslik">
+  {% if kind == "couple" %}
+  <header class="result__head score">
+    {% set circumference = 326.73 %}
+    <svg class="ring" viewBox="0 0 120 120" role="img" aria-label="Uyum skoru yüzde {{ result.uyum_skoru }}">
+      <circle class="ring__track" cx="60" cy="60" r="52"/>
+      <circle class="ring__value" cx="60" cy="60" r="52" stroke-dasharray="{{ circumference }}"
+              stroke-dashoffset="{{ '%.2f'|format(circumference * (1 - result.uyum_skoru / 100)) }}"
+              transform="rotate(-90 60 60)"/>
+      <text class="ring__text" x="60" y="66" text-anchor="middle">%{{ result.uyum_skoru }}</text>
+      <text class="ring__label" x="60" y="84" text-anchor="middle">uyum</text>
+    </svg>
+    <div>
+      {% if display_name %}<p class="result__for">{{ display_name }}</p>{% endif %}
+      <h1 class="result__type" id="sonuc-baslik">İlişki uyumunuz</h1>
+      <p class="result__summary">{{ result.ozet }}</p>
+    </div>
+  </header>
+
+  <section aria-labelledby="ortak-farkli">
+    <h2 id="ortak-farkli" class="visually-hidden">Ortak ve farklı yönler</h2>
+    <div class="lists">
+      <div>
+        <h3>Ortak yönleriniz</h3>
+        <ul class="mt-4">{% for item in result.ortak_yonler %}<li>{{ item }}</li>{% endfor %}</ul>
+      </div>
+      <div>
+        <h3>Farklarınız</h3>
+        <ul class="list--growth mt-4">{% for item in result.farklar %}<li>{{ item }}</li>{% endfor %}</ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="oneri">
+    <h2 id="oneri">İletişim önerisi</h2>
+    <p class="advice">{{ result.iletisim_onerisi }}</p>
+  </section>
+
+  {% else %}
+  <header class="result__head">
+    {% if display_name %}<p class="result__for">{{ display_name }}</p>{% endif %}
+    <h1 class="result__type" id="sonuc-baslik">{{ result.tip_adi }}</h1>
+    <p class="result__summary">{{ result.ozet }}</p>
+  </header>
+
+  <section aria-labelledby="eksenler">
+    <h2 id="eksenler">Dört eksende sen</h2>
+    <ul class="spectrum">
+      {% for key, labels in axis_labels.items() %}
+      {% set value = result.eksenler[key] %}
+      <li class="spectrum__row">
+        <span class="spectrum__label"><span>{{ labels[0] }}</span><span class="spectrum__value">{{ value }}<span class="visually-hidden"> / 100</span></span></span>
+        <div class="spectrum__track" aria-hidden="true">
+          <svg>
+            <line class="spectrum__line" x1="0" y1="10" x2="100%" y2="10"/>
+            <line class="spectrum__mid" x1="50%" y1="4" x2="50%" y2="16"/>
+            <circle class="spectrum__dot" cx="{{ value }}%" cy="10" r="8"/>
+          </svg>
+        </div>
+        <span class="spectrum__poles"><span>{{ labels[1] }}</span><span>{{ labels[2] }}</span></span>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section aria-labelledby="yonler">
+    <h2 id="yonler" class="visually-hidden">Güçlü yönler ve gelişim alanları</h2>
+    <div class="lists">
+      <div>
+        <h3>Güçlü yönlerin</h3>
+        <ul class="mt-4">{% for item in result.guclu_yonler %}<li>{{ item }}</li>{% endfor %}</ul>
+      </div>
+      <div>
+        <h3>Gelişim alanların</h3>
+        <ul class="list--growth mt-4">{% for item in result.gelisim_alanlari %}<li>{{ item }}</li>{% endfor %}</ul>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <div class="result__actions">
+    <div class="btn-row">
+      {% if share_id %}
+        {% set page_url = url_for("main.shared_result", share_id=share_id, _external=True) %}
+        <button class="btn btn--primary share-only" type="button" data-share="{{ page_url }}" data-title="{{ page_title }}">{{ icon("share") }}<span>Paylaş</span></button>
+        <button class="btn" type="button" data-copy="{{ page_url }}" data-input="share-link" data-status="share-status">{{ icon("copy") }}<span>Bağlantıyı kopyala</span></button>
+        <a class="btn" href="{{ url_for('main.shared_image', share_id=share_id) }}" download="sonuc-{{ share_id }}.png">{{ icon("download") }}<span>Görseli indir</span></a>
+      {% endif %}
+      <a class="btn" href="{{ url_for('main.test_couple_start' if kind == 'couple' else 'main.test_single') }}">{{ icon("redo") }}<span>Testi yeniden çöz</span></a>
+      {% if share_id and owner %}
+      <form method="post" action="{{ url_for('main.delete_result', share_id=share_id) }}" data-confirm="Sonuç kalıcı olarak silinsin mi? Bu işlem geri alınamaz.">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn--danger" type="submit">{{ icon("trash") }}<span>Sonucumu sil</span></button>
+      </form>
+      {% endif %}
+    </div>
+    {% if share_id %}
+    <label class="visually-hidden" for="share-link">Paylaşım bağlantısı</label>
+    <input class="visually-hidden" id="share-link" value="{{ url_for('main.shared_result', share_id=share_id, _external=True) }}" readonly tabindex="-1">
+    <p class="copy-status" id="share-status" role="status"></p>
+    {% else %}
+    <p class="notice mt-4" role="status">Sonuç şu an kaydedilemedi; bu yüzden paylaşım bağlantısı yok. Sayfayı kapatmadan önce ekran görüntüsü alabilirsin.</p>
+    {% endif %}
+    <p class="result__note">Eğlence amaçlıdır, klinik değerlendirme değildir.{% if share_id %} Bağlantıyı bilen herkes bu sonucu görebilir; sonuç {{ "7" if kind == "couple" else "30" }} gün sonra silinir.{% endif %}</p>
+  </div>
+</article>
+{% endblock %}

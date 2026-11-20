@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Analiz yapılamadı · Kişilik ve İlişki{% endblock %}
+{% block meta %}<meta name="robots" content="noindex">{% endblock %}
+{% block body_class %}{{ "theme-couple" if mode == "couple" else "" }}{% endblock %}
+{% block content %}
+<div class="error-page">
+  <h1>Analiz şu an yapılamadı</h1>
+  {% if mode == "couple" %}
+    <p class="lead mt-4">Cevaplarınız kaydedildi. Yapay zekâ hizmeti yanıt vermedi ya da kota doldu. Tekrar denediğinizde soruları yeniden cevaplamanız gerekmez.</p>
+    <form method="post" action="{{ url_for('main.analyze_couple_retry') }}" data-once>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="session_id" value="{{ session_id }}">
+      <div class="btn-row">
+        <button class="btn btn--primary" type="submit" data-busy="Analiz hazırlanıyor">{{ icon("redo") }}<span>Tekrar dene</span></button>
+        <a class="btn" href="{{ url_for('main.index') }}">Ana sayfaya dön</a>
+      </div>
+    </form>
+  {% else %}
+    <p class="lead mt-4">Cevapların kaydedildi ve bu sayfada duruyor. Yapay zekâ hizmeti yanıt vermedi ya da kota doldu. Tekrar denediğinde soruları yeniden cevaplaman gerekmez.</p>
+    <form method="post" action="{{ url_for('main.test_single_post') }}" data-once>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="onay" value="1">
+      <input type="hidden" name="username" value="{{ nickname }}">
+      {% if show_name %}<input type="hidden" name="karta_ekle" value="1">{% endif %}
+      {% for qid, answer in answers.items() %}<input type="hidden" name="{{ qid }}" value="{{ answer }}">{% endfor %}
+      <div class="btn-row">
+        <button class="btn btn--primary" type="submit" data-busy="Analiz hazırlanıyor">{{ icon("redo") }}<span>Tekrar dene</span></button>
+        <a class="btn" href="{{ url_for('main.index') }}">Ana sayfaya dön</a>
+      </div>
+    </form>
+  {% endif %}
+  <p class="small muted mt-6">Sorun sürerse birkaç dakika bekle. Aynı bağlantıdan dakikada en çok 5 deneme yapılabilir.</p>
+</div>
+{% endblock %}

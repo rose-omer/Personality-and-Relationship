@@ -1,91 +1,97 @@
-# 🧠 AI Destekli Görselli Kişilik & İlişki Testi
-[🔗 Uygulamayı hemen deneyin](https://personality-and-relationship.onrender.com)
-## 📌 EMAR Yapay Zeka Staj Projesi
+# Kişilik ve İlişki Testi
 
-Bu proje, Emar bünyesindeki staj sürecim boyunca geliştirdiğim yenilikçi bir yapay zekâ uygulamasıdır. Staj süresi boyunca Python (Flask), yapay zekâ API entegrasyonları ve modern web teknolojileri üzerinde pratik çalışmalar gerçekleştirdim. Özellikle kullanıcı etkileşimli testler tasarlayarak, verilerin anlamlı çıktılara dönüştürülmesini sağlayan sistemler geliştirdim. Geliştirme süreci boyunca yazılım mimarisi, kullanıcı deneyimi ve veri analitiği konularında derinlemesine bilgi sahibi oldum.
+[![CI](https://github.com/rose-omer/Personality-and-Relationship/actions/workflows/ci.yml/badge.svg)](https://github.com/rose-omer/Personality-and-Relationship/actions/workflows/ci.yml)
+![Python 3.13](https://img.shields.io/badge/python-3.13-1f6b52)
 
+16 soruluk bir kişilik testi ve iki kişilik uyum testi. Cevapları Google Gemini yorumlar; model serbest metin yerine JSON şemasına uyan yapılandırılmış çıktı döndürür. Sonuç, dört eksenli bir kart olarak gösterilir ve paylaşılabilir bir bağlantıyla (Open Graph görseliyle birlikte) açılır.
 
-Bu proje, kullanıcıların kişilik özelliklerini ve çiftlerin ilişkisel uyumlarını analiz eden yapay zeka destekli bir test uygulamasıdır. Flask altyapısı üzerine kurulmuş olan bu sistem, Google Gemini API kullanarak analizler yapar ve sonucu kullanıcıya sunar.
+Canlı demo: https://personality-and-relationship.onrender.com
+İlk açılış yaklaşık 1 dakika sürebilir (Render Free servisi 15 dakika trafiksizlikte uyur).
 
-Testler iki modda çalışır:
-- **Tekli Mod (Single):** Bireyin kişilik analizi yapılır.
-- **İkili Mod (Couple):** İki kullanıcının cevapları karşılaştırılarak ilişki uyumu hesaplanır.
-
----
-
-## 🖼️ Özellikler
-
-- 📸 Resimli ve metin tabanlı sorular (toplam 16 soru)
-- ✨ Google Gemini Pro AI ile analiz
-- 👤 Kişilik değerlendirmesi
-- 💑 İlişki uyumu testi
-- 🌐 Render.com üzerinden canlı dağıtım
-- 📝 Kolay arayüz, sade HTML + Jinja2 şablon yapısı
-
----
-
-## 📂 Proje Yapısı
-```bash
-
-proje-klasörü/
-│
-├── app.py # Ana Flask uygulaması
-├── requirements.txt # Gerekli kütüphaneler
-├── Procfile # Render için çalışma komutu
-├── questions.json # Soru listesi (görselli ve metinli)
-├── templates/ # HTML şablonları
-│ ├── index.html
-│ ├── test_single.html
-│ ├── start_couple.html
-│ ├── wait.html
-│ └── result.html
+## Mimari
 
 ```
+Tarayıcı ──► Flask (app.py)
+               ├─ ai.py ──► Google Gemini API (response_json_schema, Pydantic ile doğrulama)
+               ├─ db.py ──► Postgres (results, couple_sessions)
+               └─ og_image.py ──► Pillow ile 1200x630 paylaşım görseli
+```
 
+| Dosya | Görev |
+|---|---|
+| `app.py` | Rotalar, doğrulama, hata sayfaları, CSRF, hız sınırı |
+| `ai.py` | Gemini istemcisi, istemler, `FakeAnalyzer` |
+| `models.py` | `SingleResult`, `CoupleResult` şemaları |
+| `db.py` | `PostgresStore` (canlı), `MemoryStore` (test ve yerel) |
+| `schema.sql`, `migrations/` | Veritabanı şeması ve göçler |
+| `templates/`, `static/` | Tek `base.html`, tek `app.css`, aşamalı geliştirilmiş `app.js` |
 
----
+## Teknik kararlar
 
-## 🚀 Render.com Üzerinden Yayınlama (Deployment)
+- **JSON şeması:** Gemini `response_json_schema` ile şemaya uygun çıktı üretir. Pydantic aralıkları (0–100) ve liste uzunluklarını yeniden doğrular. Kart alanları güvenilir biçimde dolar; ham Markdown görünmez.
+- **Oturumlar Postgres'te:** Çift testi oturumları `couple_sessions` tablosunda. Servis yeniden başlasa da açık oturum kaybolmaz; birden çok worker aynı veriyi görür.
+- **Tek çalıştırma:** İkinci kişi bitirince koşullu `UPDATE ... RETURNING` analizi bir kez başlatır. Sonuç sayfası yalnız kayıtlı sonucu okur; yenileme Gemini'yi yeniden çağırmaz.
+- **KVKK:** IP adresi veritabanına yazılmaz. Test başında aydınlatma metni ve onay kutusu var. Sonuçlar 30 gün, çift oturumları 7 gün saklanır. "Sonucumu sil" kaydı hemen siler. Aydınlatma metni: `/gizlilik`.
+- **Güvenlik:** `SECRET_KEY` ortamdan okunur (yoksa uygulama açılmaz), bütün `POST` formlarında CSRF, `ProxyFix(x_for=1)`, analiz rotalarında `5/dakika; 50/gün` sınırı, sıkı CSP.
+- **Hız sınırı deposu:** Sayaç varsayılan olarak bellekte (`memory://`) ve süreç başınadır. Bu yüzden servis tek worker ve 4 iş parçacığıyla koşar; sınır tam uygulanır. Worker sayısını artırırsan `RATELIMIT_STORAGE_URI` ile paylaşımlı bir depo (ör. Redis) tanımla; yoksa sınır worker sayısıyla katlanır.
+- **Arayüz:** JS kapalıyken bütün sorular tek formda görünür. JS açıkken her ekranda bir soru, ilerleme çubuğu, klavyeyle tam kullanım, açık/koyu tema ve `prefers-reduced-motion` desteği var.
 
-### 1. GitHub’a Yükleyin
+## Yerelde çalıştırma
 
-Projeyi bir GitHub reposu olarak paylaşın. Aşağıdaki dosyaların eksiksiz olduğundan emin olun:
+Bu makinede 8000 portunu kullanma; örnekler 8100 kullanır.
 
-- `app.py`
-- `requirements.txt`
-- `Procfile`
-- `questions.json`
-- `templates/`  
+```bash
+python -m venv .venv
+.venv/Scripts/activate            # Linux/macOS: source .venv/bin/activate
+pip install -r requirements.txt -r requirements-dev.txt
+cp .env.example .env              # SECRET_KEY değerini doldur
+flask --app app run --port 8100
+```
 
-### 2. Render.com’a Giriş Yapın
+- Gemini anahtarı olmadan denemek için `.env` içinde `AI_FAKE=1` yaz. Uygulama sabit bir örnek analiz döndürür.
+- `DATABASE_URL` tanımsızsa veriler bellekte tutulur ve yeniden başlatmada silinir.
 
-- [https://render.com](https://render.com) adresine gidin
-- Giriş yapın ve **"New + → Web Service"** seçin
-- GitHub hesabınızı bağlayın ve projenizi seçin
+## Testler
 
-### 3. Servis Ayarları
+```bash
+ruff check .
+ruff format --check .
+pytest -q
+```
 
-- **Environment:** Python
-- **Start Command:**
+Testler Gemini'ye gerçek çağrı yapmaz; sahte analizci kullanır. `tests/test_postgres_store.py` yalnız `TEST_DATABASE_URL` tanımlıysa çalışır (CI'da Postgres servis kapsayıcısıyla).
 
+## Veritabanı
 
+Yeni kurulum:
 
-## 🔐 API Anahtarı
-- Gemini API'yi kullanabilmek için bir Google API Key'e ihtiyacınız var. Şuradan alınabilir:
+```bash
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f schema.sql
+```
 
-👉 https://makersuite.google.com/app/apikey
-## Ekran Görüntüleri
-<img width="1912" height="881" alt="image" src="https://github.com/user-attachments/assets/84d3a338-2087-46ca-aff4-efac49d8808c" />
-<img width="1918" height="909" alt="image" src="https://github.com/user-attachments/assets/04627064-681c-4111-a469-cd627285328a" />
-<img width="1910" height="890" alt="image" src="https://github.com/user-attachments/assets/99ba90b1-9cea-4c71-8949-e3bdff51713d" />
+Eski tabloların bulunduğu mevcut veritabanı:
 
-## 👨‍💻 Geliştirici Notları
-- Proje sade, modüler ve genişletilebilir şekilde tasarlanmıştır.
+```bash
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f migrations/001_drop_ip_columns.sql
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f migrations/002_results_and_couple_sessions.sql
+# İsteğe bağlı, yedekten sonra: migrations/003_drop_legacy_tables.sql
+```
 
-- Görseller Unsplash üzerinden alınmıştır, telif haklarına dikkat edilmelidir.
+Önerilen sağlayıcı: Neon Free (`sslmode=require`). Render Free Postgres 30 günde sona erer.
 
-- questions.json dosyasına yeni sorular ekleyerek sistemi kolayca büyütebilirsiniz.
+## Dağıtım (Render)
 
-## 🧠 Yapay Zeka Modeli
-- Proje, Google'ın Gemini-Pro modelini kullanmaktadır. API üzerinden doğal dilde analiz yapar ve sonuçları kullanıcı dostu şekilde sunar.
+`render.yaml` servis ayarlarını taşır. Panodan elle kurulan mevcut serviste şunları güncelle:
 
+- Başlatma komutu: `gunicorn "app:create_app()" --workers 1 --threads 4 --timeout 60`
+- Ortam değişkenleri: `SECRET_KEY`, `GEMINI_API_KEY`, `GEMINI_MODEL=gemini-3.5-flash-lite`, `DATABASE_URL`
+- `GEMINI_API_KEY` ve `GOOGLE_API_KEY` birlikte tanımlanırsa `GOOGLE_API_KEY` kazanır; yalnız birini tanımla.
+- Python sürümü `.python-version` dosyasından okunur (`3.13`).
+
+## Proje geçmişi
+
+Bu proje EMAR bünyesindeki yapay zekâ stajında başladı. Staj sürecinde Flask, yapay zekâ API entegrasyonu ve kullanıcı etkileşimli test tasarımı üzerinde çalışıldı.
+
+Soru görselleri Unsplash'ten alınmıştır ve Unsplash lisansıyla kullanılır.
+
+Sonuçlar eğlence amaçlıdır; klinik değerlendirme değildir.
