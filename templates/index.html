@@ -1,44 +1,39 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon, mark %}
 {% block content %}
-<section class="home-intro" aria-labelledby="baslik">
-  <h1 id="baslik">Kendini ve ilişkini 16 soruda tanı.</h1>
-  <p class="lead">Cevaplarını Google Gemini yorumlar; sonuç dört eksenli bir kartla gelir. Kayıt yok, takma ad isteğe bağlı.</p>
-  <p class="cold-start" data-cold-start hidden>Sunucu uykudaydı; ilk açılış bu yüzden uzun sürdü (1 dakikayı bulabilir). Sonraki adımlar hızlı.</p>
+<section class="hero" aria-labelledby="baslik">
+  <div class="hero__text">
+    <h1 id="baslik">Kendini ve ilişkini 16 soruda tanı.</h1>
+    <p class="lead">Cevaplarını Google Gemini yorumlar; sonuç dört eksenli bir kartla gelir. Kayıt yok, takma ad isteğe bağlı.</p>
+    <p class="cold-start" data-cold-start hidden>Sunucu uykudaydı; ilk açılış bu yüzden uzun sürdü (1 dakikayı bulabilir). Sonraki adımlar hızlı.</p>
+  </div>
+  <svg class="hero__art venn" viewBox="0 0 640 440" aria-hidden="true" focusable="false">
+    <defs>
+      <pattern id="hero-dot-pink" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(22)"><circle class="dot--pink" cx="4.5" cy="4.5" r="2.2"/></pattern>
+      <pattern id="hero-dot-blue" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(-18)"><circle class="dot--blue" cx="4.5" cy="4.5" r="2.4"/></pattern>
+    </defs>
+    <g class="venn__inks">
+      <circle class="venn__halftone" cx="96" cy="92" r="64" fill="url(#hero-dot-blue)"/>
+      <circle class="venn__halftone" cx="560" cy="372" r="70" fill="url(#hero-dot-pink)"/>
+      <circle class="venn__a" cx="236" cy="222" r="180"/>
+      <circle class="venn__b" cx="404" cy="228" r="180"/>
+      <circle class="venn__misprint" cx="241" cy="217" r="180"/>
+    </g>
+  </svg>
 </section>
 
 <div class="paths">
   <a class="path" href="{{ url_for('main.test_single') }}">
-    <div>
-      <h2 class="path__title">Kendini tanı</h2>
-      <p class="path__meta">Tek kişilik, yaklaşık 3 dakika</p>
-    </div>
-    <div class="path__preview" aria-hidden="true">
-      <ul class="spectrum">
-        <li class="spectrum__row">
-          <span class="spectrum__label">Planlılık</span>
-          <div class="spectrum__track">
-            <svg><line class="spectrum__line" x1="0" y1="10" x2="100%" y2="10"/><circle class="spectrum__dot" cx="68%" cy="10" r="8"/></svg>
-          </div>
-          <span class="spectrum__poles"><span>Akışına bırakan</span><span>Önceden planlayan</span></span>
-        </li>
-      </ul>
-    </div>
+    <span class="path__mark">{{ mark("pink") }}</span>
+    <h2 class="path__title">Kendini tanı</h2>
+    <p class="path__meta">Tek kişilik, yaklaşık 3 dakika. Sonuçta dört eksende nerede durduğunu görürsün.</p>
     <span class="path__cta">Teste başla {{ icon("next") }}</span>
   </a>
 
-  <a class="path path--couple" href="{{ url_for('main.test_couple_start') }}">
-    <div>
-      <h2 class="path__title">Birlikte keşfet</h2>
-      <p class="path__meta">İki kişilik; her biriniz kendi bağlantısından çözer</p>
-    </div>
-    <div class="path__preview" aria-hidden="true">
-      <svg class="ring ring--small" viewBox="0 0 120 120">
-        <circle class="ring__track" cx="60" cy="60" r="52"/>
-        <circle class="ring__value" cx="60" cy="60" r="52" stroke-dasharray="326.73" stroke-dashoffset="91.48" transform="rotate(-90 60 60)"/>
-        <text class="ring__text" x="60" y="70" text-anchor="middle">%72</text>
-      </svg>
-      <p class="path__preview-caption">Uyum skoru, ortak yönleriniz, farklarınız ve bir iletişim önerisi.</p>
-    </div>
+  <a class="path" href="{{ url_for('main.test_couple_start') }}">
+    <span class="path__mark">{{ mark("overlap") }}</span>
+    <h2 class="path__title">Birlikte keşfet</h2>
+    <p class="path__meta">İki kişilik; her biriniz kendi bağlantısından çözer. Uyum skoru, ortak yönleriniz, farklarınız ve bir iletişim önerisi.</p>
     <span class="path__cta">Bağlantıları oluştur {{ icon("next") }}</span>
   </a>
 </div>

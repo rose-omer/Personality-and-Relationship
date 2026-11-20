@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% from "_icons.html" import icon %}
+{% from "_icons.html" import icon, mark %}
 {% block title %}{{ "Çift testi" if mode == "couple" else "Kişilik testi" }} · Kişilik ve İlişki{% endblock %}
-{% block body_class %}{{ "theme-couple" if mode == "couple" else "" }}{% endblock %}
+{% block body_class %}{{ "theme-couple" if mode == "couple" else "" }}{{ " ink-blue" if user == "user2" else "" }}{% endblock %}
 {% block content %}
 <div class="quiz" data-quiz>
   <div class="quiz__bar">
@@ -28,6 +28,10 @@
       {% if mode == "couple" %}
         <h1 id="giris-baslik" tabindex="-1" data-step-focus>Merhaba {{ nickname }}</h1>
         <p class="lead">{{ partner }} ile aynı 16 soruyu cevaplayacaksın. İkiniz de bitirince uyum analizi açılır.</p>
+        <p class="ink-legend">
+          <span>{{ mark("pink" if user != "user2" else "blue") }}Sen, {{ "pembe" if user != "user2" else "mavi" }} mürekkep</span>
+          <span>{{ mark("blue" if user != "user2" else "pink") }}{{ partner }}, {{ "mavi" if user != "user2" else "pembe" }} mürekkep</span>
+        </p>
       {% else %}
         <h1 id="giris-baslik" tabindex="-1" data-step-focus>Başlamadan önce</h1>
         <p class="lead">16 soru, yaklaşık 3 dakika. Doğru ya da yanlış cevap yok; ilk aklına geleni seç.</p>
@@ -49,7 +53,7 @@
           <li>Sonuç 30 gün, çift oturumu 7 gün saklanır; sonra kendiliğinden silinir.</li>
           <li>IP adresin veritabanına yazılmaz.</li>
         </ul>
-        <p class="small"><a href="{{ url_for('main.privacy') }}">Aydınlatma metninin tamamı</a></p>
+        <p class="small"><a class="link-target" href="{{ url_for('main.privacy') }}">Aydınlatma metninin tamamı</a></p>
       </div>
 
       <div {% if errors.onay %}data-has-error{% endif %}>
@@ -64,7 +68,9 @@
     {% for q in questions %}
     <fieldset class="step question" data-step {% if errors[q.id] %}data-has-error aria-describedby="{{ q.id }}-error"{% endif %}>
       {% if q.image %}
-        <img class="question__image" src="{{ q.image }}" alt="{{ q.alt or '' }}" width="800" height="533" loading="lazy" decoding="async">
+        <div class="question__figure">
+          <img class="question__image" src="{{ q.image }}" alt="{{ q.alt or '' }}" width="800" height="533" loading="lazy" decoding="async">
+        </div>
       {% endif %}
       <legend tabindex="-1" data-step-focus>
         <span class="question__index">Soru {{ loop.index }} / {{ questions|length }}</span>

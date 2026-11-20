@@ -271,9 +271,14 @@ def test_couple_user(session_id, user):
             session_id=session_id,
             own_link=own_link,
             status=couple.status,
+            user=user,
         )
 
-    context = {"nickname": couple.name_of(user), "partner": couple.name_of(partner)}
+    context = {
+        "nickname": couple.name_of(user),
+        "partner": couple.name_of(partner),
+        "user": user,
+    }
     if request.method == "GET":
         return render_quiz("couple", **context)[0]
 
@@ -350,11 +355,13 @@ def shared_result(share_id):
         current_app.logger.exception("Süresi dolan kayıtlar silinemedi")
     shared = _load_shared(share_id)
     owner = owns(share_id)
+    names = None
     if shared.kind == "single":
         display_name = shared.nickname
     else:
         # Çift adları yalnız katılımcıya görünür; bağlantıyı alan başkası görmez.
         display_name = f"{shared.name1} ve {shared.name2}" if owner else None
+        names = (shared.name1, shared.name2) if owner else None
     return render_template(
         "result.html",
         kind=shared.kind,
@@ -362,6 +369,7 @@ def shared_result(share_id):
         share_id=share_id,
         owner=owner,
         display_name=display_name,
+        names=names,
         axis_labels=AXIS_LABELS,
     )
 

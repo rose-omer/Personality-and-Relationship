@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_icons.html" import icon %}
+{% from "_icons.html" import icon, mark %}
 {% block title %}Çift testi · Kişilik ve İlişki{% endblock %}
 {% block body_class %}theme-couple{% endblock %}
 {% block content %}
@@ -18,16 +18,16 @@
 
   <form method="post" class="stack" novalidate data-once>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    {% for field, label in [("name1", "Senin takma adın"), ("name2", "Partnerinin takma adı")] %}
+    {% for field, label, ink in [("name1", "Senin takma adın", "pink"), ("name2", "Partnerinin takma adı", "blue")] %}
     <div class="field">
-      <label for="{{ field }}">{{ label }}</label>
+      <label class="field__label--ink" for="{{ field }}">{{ mark(ink) }}<span>{{ label }}</span></label>
       <input class="input" id="{{ field }}" name="{{ field }}" maxlength="40" required autocomplete="off"
              value="{{ form.get(field, '') }}"
              {% if errors[field] %}aria-invalid="true" aria-describedby="{{ field }}-error"{% endif %}>
       {% if errors[field] %}<p class="field-error" id="{{ field }}-error">{{ icon("alert") }}<span>{{ errors[field] }}</span></p>{% endif %}
     </div>
     {% endfor %}
-    <p class="field__hint">Takma adlar yalnız bağlantı sayfasında ve size gösterilen sonuçta görünür. Paylaşım görselinde ad yer almaz.</p>
+    <p class="field__hint">Sen pembe, partnerin mavi mürekkeple basılır. Takma adlar yalnız bağlantı sayfasında ve size gösterilen sonuçta görünür. Paylaşım görselinde ad yer almaz.</p>
 
     <div class="disclosure">
       <strong>Kısa aydınlatma</strong>
@@ -36,7 +36,7 @@
         <li>Analiz için Google Gemini API'sine (yurt dışı) gönderilir. IP adresi veritabanına yazılmaz.</li>
         <li>Partnerin, kendi bağlantısını açınca ayrıca onay verir.</li>
       </ul>
-      <p class="small"><a href="{{ url_for('main.privacy') }}">Aydınlatma metninin tamamı</a></p>
+      <p class="small"><a class="link-target" href="{{ url_for('main.privacy') }}">Aydınlatma metninin tamamı</a></p>
     </div>
 
     <div>

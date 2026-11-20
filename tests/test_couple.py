@@ -159,3 +159,59 @@ def test_purge_removes_expired_rows(store):
     store._couples[session_id]["expires_at"] = datetime.now(UTC) - timedelta(days=1)
     store._results["abcdefghijkl"]["expires_at"] = datetime.now(UTC) - timedelta(days=1)
     assert store.purge_expired() == 2
+
+
+def test_each_partner_gets_own_ink(client):
+    """Birinci kişi pembe, ikinci kişi mavi mürekkeple basılır."""
+    session_id = start_session(client)
+    first = client.get(f"/test/couple/{session_id}/user1").get_data(as_text=True)
+    second = client.get(f"/test/couple/{session_id}/user2").get_data(as_text=True)
+    assert "ink-blue" not in first
+    assert "Sen, pembe mürekkep" in first
+    assert "ink-blue" in second
+    assert "Sen, mavi mürekkep" in second
+
+
+def test_stranger_sees_letters_instead_of_names_in_diagram(app):
+    owner, stranger = app.test_client(), app.test_client()
+    session_id = start_session(owner)
+    answer(owner, session_id, "user1")
+    answer(owner, session_id, "user2", pick=1)
+    status = owner.get(f"/api/check_analysis/{session_id}").get_json()
+    location = owner.get(status["result_url"]).headers["Location"]
+    owner_page = owner.get(location).get_data(as_text=True)
+    stranger_page = stranger.get(location).get_data(as_text=True)
+    assert "pembe daire Ada, mavi daire Can" in owner_page
+    assert "pembe daire A, mavi daire B" in stranger_page
+    assert "Ada" not in stranger_page
+
+
+def test_couple_result_overlays_both_axes(client, store):
+    """Çift sonucunda dört eksen iki mürekkeple üst üste basılır."""
+    session_id = start_session(client)
+    answer(client, session_id, "user1")
+    answer(client, session_id, "user2", pick=1)
+    status = client.get(f"/api/check_analysis/{session_id}").get_json()
+    page = client.get(status["result_url"], follow_redirects=True).get_data(as_text=True)
+    result = store.get_couple(session_id).result
+    assert "Dört eksen üst üste" in page
+    assert page.count('class="bar bar--duo"') == 4
+    a, b = result["eksenler_a"]["sosyallik"], result["eksenler_b"]["sosyallik"]
+    assert f"Ada {a}, Can {b}" in page
+
+
+def test_old_couple_result_without_axes_still_renders(client, store):
+    """Eksensiz eski kayıt bozulmaz; eksen bölümü gizlenir."""
+    session_id = str(uuid.uuid4())
+    store.create_couple(session_id, "Ada", "Can")
+    old = {
+        "uyum_skoru": 60,
+        "ozet": "Özet.",
+        "ortak_yonler": ["a", "b"],
+        "farklar": ["c"],
+        "iletisim_onerisi": "Konuşun.",
+    }
+    store.finish_analysis(session_id, old, "abcdefghijkm")
+    page = client.get("/r/abcdefghijkm")
+    assert page.status_code == 200
+    assert "Dört eksen üst üste" not in page.get_data(as_text=True)

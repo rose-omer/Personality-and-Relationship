@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_icons.html" import icon %}
+{% from "_icons.html" import icon, mark %}
 {% block title %}Test bağlantıları · Kişilik ve İlişki{% endblock %}
 {% block body_class %}theme-couple{% endblock %}
 {% block content %}
@@ -9,14 +9,14 @@
 
   <div class="link-list">
     {% for user, name in [("user1", name1), ("user2", name2)] %}
-    <section class="link-card" aria-labelledby="{{ user }}-title">
-      <h2 id="{{ user }}-title">{{ name }}{% if loop.first %} (sen){% endif %}</h2>
+    <section class="link-block" aria-labelledby="{{ user }}-title">
+      <h2 class="link-block__title" id="{{ user }}-title">{{ mark("pink" if loop.first else "blue") }}<span>{{ name }}{% if loop.first %} (sen){% endif %}</span></h2>
       <label class="visually-hidden" for="{{ user }}-link">{{ name }} için test bağlantısı</label>
-      <input class="input" id="{{ user }}-link" value="{{ links[user] }}" readonly>
+      <input class="input input--link" id="{{ user }}-link" value="{{ links[user] }}" readonly>
       <div class="btn-row">
+        {% if loop.first %}<a class="btn btn--primary" href="{{ links[user] }}">Testimi şimdi çöz</a>{% endif %}
         <button class="btn" type="button" data-copy="{{ links[user] }}" data-input="{{ user }}-link" data-status="{{ user }}-status">{{ icon("copy") }}<span>Bağlantıyı kopyala</span></button>
         <button class="btn share-only" type="button" data-share="{{ links[user] }}" data-title="Birlikte keşfet: {{ name }} için test">{{ icon("share") }}<span>Paylaş</span></button>
-        {% if loop.first %}<a class="btn btn--primary" href="{{ links[user] }}">Testimi şimdi çöz</a>{% endif %}
       </div>
       <p class="copy-status" id="{{ user }}-status" role="status"></p>
     </section>

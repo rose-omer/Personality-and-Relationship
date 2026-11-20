@@ -21,6 +21,8 @@ VALID_COUPLE = {
     "ortak_yonler": ["a", "b"],
     "farklar": ["c"],
     "iletisim_onerisi": "Konuşun.",
+    "eksenler_a": {"sosyallik": 68, "planlilik": 41, "stres_yonetimi": 57, "aciklik": 82},
+    "eksenler_b": {"sosyallik": 34, "planlilik": 79, "stres_yonetimi": 63, "aciklik": 71},
 }
 
 
@@ -49,6 +51,14 @@ def test_axis_out_of_range_is_rejected():
 def test_list_lengths_are_enforced(field, items):
     with pytest.raises(ValidationError):
         SingleResult.model_validate({**VALID_SINGLE, field: items})
+
+
+def test_couple_schema_requires_both_axes():
+    schema = CoupleResult.model_json_schema()
+    assert {"eksenler_a", "eksenler_b"} <= set(schema["required"])
+    missing = {k: v for k, v in VALID_COUPLE.items() if k != "eksenler_b"}
+    with pytest.raises(ValidationError):
+        CoupleResult.model_validate(missing)
 
 
 def test_json_schema_carries_item_limits():

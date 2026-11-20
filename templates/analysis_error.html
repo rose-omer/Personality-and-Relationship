@@ -5,6 +5,18 @@
 {% block body_class %}{{ "theme-couple" if mode == "couple" else "" }}{% endblock %}
 {% block content %}
 <div class="error-page">
+  <svg class="error-page__art" viewBox="0 0 360 200" aria-hidden="true" focusable="false">
+    <g class="venn__inks">
+      {#- Cevaplar basıldı; kesişim henüz çıkmadı. -#}
+      {% if mode == "couple" %}
+      <circle class="venn__a" cx="104" cy="100" r="80"/>
+      <circle class="venn__b" cx="256" cy="104" r="80"/>
+      {% else %}
+      <circle class="venn__a" cx="180" cy="100" r="80"/>
+      <circle class="wait__pending wait__pending--a" cx="188" cy="94" r="80"/>
+      {% endif %}
+    </g>
+  </svg>
   <h1>Analiz şu an yapılamadı</h1>
   {% if mode == "couple" %}
     <p class="lead mt-4">Cevaplarınız kaydedildi. Yapay zekâ hizmeti yanıt vermedi ya da kota doldu. Tekrar denediğinizde soruları yeniden cevaplamanız gerekmez.</p>

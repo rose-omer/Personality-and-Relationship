@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
 {% block title %}Sonuç bekleniyor · Kişilik ve İlişki{% endblock %}
-{% block body_class %}theme-couple{% endblock %}
+{% block body_class %}theme-couple{{ " ink-blue" if user == "user2" else "" }}{% endblock %}
 {% block content %}
-<div class="page" data-poll="{{ url_for('main.check_analysis', session_id=session_id) }}">
+<div class="page wait" data-poll="{{ url_for('main.check_analysis', session_id=session_id) }}">
+  {#- Biten kişinin dairesi basılı, bekleyenin dairesi kesik çizgi. -#}
+  <svg class="wait__art{{ ' is-both' if status == 'analiz' else '' }}" viewBox="0 0 360 200" aria-hidden="true" focusable="false">
+    <g class="venn__inks">
+      <circle class="{{ 'venn__a' if user == 'user1' or status == 'analiz' else 'wait__pending wait__pending--a' }}" cx="128" cy="100" r="84"/>
+      <circle class="{{ 'venn__b' if user == 'user2' or status == 'analiz' else 'wait__pending wait__pending--b' }}" cx="232" cy="104" r="84"/>
+    </g>
+  </svg>
+
   {% if status == "analiz" %}
     <h1>Analiz hazırlanıyor</h1>
     <p class="lead">İkiniz de bitirdiniz. Sonuç birkaç saniye içinde bu sayfada açılır.</p>
@@ -23,11 +31,11 @@
     <button class="btn" type="button" data-poll-retry hidden>{{ icon("redo") }}<span>Tekrar kontrol et</span></button>
   </div>
 
-  <section class="link-card mt-6" aria-labelledby="link-title">
+  <section class="link-block" aria-labelledby="link-title">
     <h2 id="link-title">Bu sayfayı kapatabilirsin</h2>
     <p class="muted">Sonuç bağlantın aşağıda. Daha sonra açtığında sonuç hazırsa doğrudan görünür.</p>
     <label class="visually-hidden" for="own-link">Sonuç bağlantın</label>
-    <input class="input" id="own-link" value="{{ own_link }}" readonly>
+    <input class="input input--link" id="own-link" value="{{ own_link }}" readonly>
     <div class="btn-row">
       <button class="btn" type="button" data-copy="{{ own_link }}" data-input="own-link" data-status="own-status">{{ icon("copy") }}<span>Bağlantıyı kopyala</span></button>
     </div>

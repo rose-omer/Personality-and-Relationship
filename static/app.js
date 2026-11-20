@@ -21,7 +21,7 @@
       btn.setAttribute("aria-label", dark ? "Açık temaya geç" : "Koyu temaya geç");
     });
     document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
-      m.setAttribute("content", dark ? "#121218" : "#F5F6F8");
+      m.setAttribute("content", dark ? "#181D42" : "#ECEDE9");
     });
   }
 
@@ -220,6 +220,17 @@
     show(current, Boolean(firstError));
   }
 
+  // --- Soru görseli inmezse kırık resim yerine boş baskı alanı kalsın -----------
+  function initQuestionImages() {
+    document.querySelectorAll(".question__image").forEach(function (img) {
+      function missing() {
+        img.closest(".question__figure").classList.add("is-missing");
+      }
+      if (img.complete && img.naturalWidth === 0 && img.currentSrc) missing();
+      img.addEventListener("error", missing);
+    });
+  }
+
   // --- Basit formlar: çift gönderimi engelle ----------------------------------
   function initOnceForms() {
     document.querySelectorAll("form[data-once]").forEach(function (form) {
@@ -315,6 +326,7 @@
     initColdStart();
     initShare();
     initQuiz();
+    initQuestionImages();
     initOnceForms();
     initWait();
   });

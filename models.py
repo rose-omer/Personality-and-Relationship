@@ -36,6 +36,8 @@ class CoupleResult(BaseModel):
     ortak_yonler: list[str] = Field(min_length=2, max_length=5)
     farklar: list[str] = Field(min_length=1, max_length=5)
     iletisim_onerisi: str = Field(min_length=1, max_length=600)
+    eksenler_a: Axes = Field(description="Kişi A'nın dört eksen puanı")
+    eksenler_b: Axes = Field(description="Kişi B'nin dört eksen puanı")
 
 
 # Sonuç kartında eksenlerin uç etiketleri (sol: 0, sağ: 100).

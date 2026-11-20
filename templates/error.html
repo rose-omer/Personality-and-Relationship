@@ -3,6 +3,7 @@
 {% block meta %}<meta name="robots" content="noindex">{% endblock %}
 {% block content %}
 <div class="error-page">
+  <p class="misprint" aria-hidden="true"><span class="misprint__a">{{ code }}</span><span class="misprint__b">{{ code }}</span></p>
   <p class="error-page__code">Hata {{ code }}</p>
   <h1>{{ title }}</h1>
   <p class="lead mt-4">{{ message }}</p>
