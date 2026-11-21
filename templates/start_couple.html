@@ -1,79 +1,56 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>İkili Test Başlat</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f4f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    form {
-      background: white;
-      padding: 2rem 3rem;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      max-width: 400px;
-      width: 100%;
-    }
-    h1 {
-      margin-bottom: 1.5rem;
-      color: #222;
-      text-align: center;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.3rem;
-      font-weight: 600;
-      color: #555;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 0.5rem 0.75rem;
-      margin-bottom: 1.25rem;
-      border: 1.5px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
-    }
-    input[type="text"]:focus {
-      outline: none;
-      border-color: #4CAF50;
-      box-shadow: 0 0 8px #4CAF50aa;
-    }
-    button {
-      width: 100%;
-      padding: 0.75rem;
-      font-size: 1.1rem;
-      background: #4CAF50;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    button:hover {
-      background: #388E3C;
-    }
-  </style>
-</head>
-<body>
-  <form action="{{ url_for('test_couple_start_post') }}" method="post">
-    <h1>İkili Test Başlat</h1>
-    <label for="name1">1. Kullanıcının Adı</label>
-    <input type="text" id="name1" name="name1" required />
+{% extends "base.html" %}
+{% from "_icons.html" import icon, mark %}
+{% block title %}Çift testi · Kişilik ve İlişki{% endblock %}
+{% block body_class %}theme-couple{% endblock %}
+{% block content %}
+<div class="page stack">
+  <h1>Birlikte keşfet</h1>
+  <p class="lead">İkiniz için ayrı bağlantı oluşturuyoruz. Her biriniz kendi bağlantısından aynı 16 soruyu cevaplar; ikiniz de bitirince uyum analizi açılır.</p>
 
-    <label for="name2">2. Kullanıcının Adı</label>
-    <input type="text" id="name2" name="name2" required />
+  {% if errors %}
+  <div class="error-summary" role="alert">
+    <h2>Devam etmeden önce şunları tamamla</h2>
+    <ul>
+      {% for field, message in errors.items() %}<li><a href="#{{ field }}">{{ message }}</a></li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
 
-    <button type="submit">Testi Başlat</button>
+  <form method="post" class="stack" novalidate data-once>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% for field, label, ink in [("name1", "Senin takma adın", "pink"), ("name2", "Partnerinin takma adı", "blue")] %}
+    <div class="field">
+      <label class="field__label--ink" for="{{ field }}">{{ mark(ink) }}<span>{{ label }}</span></label>
+      <input class="input" id="{{ field }}" name="{{ field }}" maxlength="40" required autocomplete="off"
+             value="{{ form.get(field, '') }}"
+             {% if errors[field] %}aria-invalid="true" aria-describedby="{{ field }}-error"{% endif %}>
+      {% if errors[field] %}<p class="field-error" id="{{ field }}-error">{{ icon("alert") }}<span>{{ errors[field] }}</span></p>{% endif %}
+    </div>
+    {% endfor %}
+    <p class="field__hint">Sen pembe, partnerin mavi mürekkeple basılır. Takma adlar yalnız bağlantı sayfasında ve size gösterilen sonuçta görünür. Paylaşım görselinde ad yer almaz.</p>
+
+    <div class="disclosure">
+      <strong>Kısa aydınlatma</strong>
+      <ul>
+        <li>Takma adlar ve cevaplar 7 gün saklanır, sonra kendiliğinden silinir.</li>
+        <li>Analiz için Google Gemini API'sine (yurt dışı) gönderilir. IP adresi veritabanına yazılmaz.</li>
+        <li>Partnerin, kendi bağlantısını açınca ayrıca onay verir.</li>
+      </ul>
+      <p class="small"><a class="link-target" href="{{ url_for('main.privacy') }}">Aydınlatma metninin tamamı</a></p>
+    </div>
+
+    <div>
+      <label class="checkbox">
+        <input type="checkbox" id="onay" name="onay" value="1" required {% if form.get("onay") %}checked{% endif %}
+               {% if errors.onay %}aria-invalid="true" aria-describedby="onay-error"{% endif %}>
+        <span>Aydınlatma metnini okudum ve onaylıyorum.</span>
+      </label>
+      {% if errors.onay %}<p class="field-error" id="onay-error">{{ icon("alert") }}<span>{{ errors.onay }}</span></p>{% endif %}
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn--primary" type="submit" data-busy="Oluşturuluyor"><span>Bağlantıları oluştur</span></button>
+    </div>
   </form>
-</body>
-</html>
+</div>
+{% endblock %}

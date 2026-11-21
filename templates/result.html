@@ -1,92 +1,208 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Test Sonucu</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #fafafa;
-      max-width: 700px;
-      margin: 2rem auto;
-      padding: 1.5rem 2rem;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgb(0 0 0 / 0.1);
-      color: #333;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 2rem;
-      color: #222;
-    }
-    .section {
-      margin-bottom: 1.5rem;
-    }
-    .section h3 {
-      margin-bottom: 0.5rem;
-      color: #4CAF50;
-      border-bottom: 2px solid #4CAF50;
-      padding-bottom: 0.3rem;
-    }
-    pre {
-      white-space: pre-wrap;
-      font-size: 1rem;
-      line-height: 1.5;
-      background: #f1f1f1;
-      padding: 1rem;
-      border-radius: 8px;
-      overflow-x: auto;
-    }
-    .back-btn {
-      display: block;
-      margin: 2rem auto 0;
-      padding: 0.8rem 2rem;
-      text-align: center;
-      background: #4CAF50;
-      color: white;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-      width: fit-content;
-      box-shadow: 0 5px 10px rgba(76,175,80,0.3);
-      transition: background 0.3s ease;
-    }
-    .back-btn:hover {
-      background: #388E3C;
-    }
-  </style>
-</head>
-<body>
-  {% if result %}
-    <h1>{{ result.başlık }}</h1>
-
-    {% if result.yorum and not (result.güçlü_yönler or result.zayıf_yönler or result.puan) %}
-      <!-- Eğer sadece yorum varsa (AI tek metin analizi) -->
-      <pre>{{ result.yorum }}</pre>
-    {% else %}
-      <!-- Eğer klasik alanlar varsa -->
-      <div class="section">
-        <h3>Güçlü Yönler</h3>
-        <p>{{ result.güçlü_yönler }}</p>
-      </div>
-      <div class="section">
-        <h3>Zayıf Yönler</h3>
-        <p>{{ result.zayıf_yönler }}</p>
-      </div>
-      <div class="section">
-        <h3>Uyum Puanı</h3>
-        <p>{{ result.puan }}</p>
-      </div>
-    {% endif %}
-
-  {% elif yorum %}
-    <!-- couple analiz için yapay zekadan gelen tek metin -->
-    <h1>Analiz Sonucu</h1>
-    <pre>{{ yorum }}</pre>
-  {% else %}
-    <h1>Sonuç bulunamadı</h1>
+{% extends "base.html" %}
+{% from "_icons.html" import icon, mark %}
+{%- if kind == "couple" -%}
+  {%- set page_title = "İlişki uyumu: %" ~ result.uyum_skoru -%}
+{%- else -%}
+  {%- set page_title = result.tip_adi -%}
+{%- endif -%}
+{% block title %}{{ page_title }} · Kişilik ve İlişki{% endblock %}
+{% block description %}{{ result.ozet|truncate(160) }}{% endblock %}
+{% block meta %}
+  {% if share_id %}
+  {% set page_url = url_for("main.shared_result", share_id=share_id, _external=True) %}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Kişilik ve İlişki Testi">
+  <meta property="og:title" content="{{ page_title }}">
+  <meta property="og:description" content="{{ result.ozet|truncate(200) }}">
+  <meta property="og:url" content="{{ page_url }}">
+  <meta property="og:image" content="{{ url_for('main.shared_image', share_id=share_id, _external=True) }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="{{ page_url }}">
   {% endif %}
-  <a href="/" class="back-btn">Ana Sayfaya Dön</a>
-</body>
-</html>
+  <meta name="robots" content="noindex">
+{% endblock %}
+{% block body_class %}{{ "theme-couple" if kind == "couple" else "" }}{% endblock %}
+{% block footer_note %}Kişilik ve İlişki Testi{% endblock %}
+
+{#- Daire içindeki ad: kısaysa sığacak boyda, uzunsa baş harf. Tam ad açıklamada yazar. -#}
+{%- macro lune_label(name, x, y, width, cls) -%}
+  {%- set size = [34, (width - 28) / ((name|length or 1) * 0.8)]|min -%}
+  {%- if name|length > 10 or size < 16 -%}
+    <text class="{{ cls }}" x="{{ x }}" y="{{ y }}" text-anchor="middle" font-size="44">{{ name[:1]|upper }}</text>
+  {%- else -%}
+    <text class="{{ cls }}" x="{{ x }}" y="{{ y }}" text-anchor="middle" font-size="{{ '%.1f'|format(size) }}">{{ name }}</text>
+  {%- endif -%}
+{%- endmacro -%}
+
+{% block content %}
+<article class="result{{ ' result--couple' if kind == 'couple' else ' result--single' }}" aria-labelledby="sonuc-baslik">
+  {% if kind == "couple" %}
+  {#- Uyum arttıkça daireler birbirine yaklaşır; kesişim alanı skoru taşır. -#}
+  {%- set score = result.uyum_skoru -%}
+  {%- set r = 190 -%}
+  {%- set cy = 250 -%}
+  {%- set d = r * (1.4 - 0.7 * score / 100) -%}
+  {%- set cx1 = 350 - d / 2 -%}
+  {%- set cx2 = 350 + d / 2 -%}
+  {%- set overlap = 2 * r - d -%}
+  {%- set score_text = "%" ~ score -%}
+  {%- set score_size = [56, (overlap - 16) / (score_text|length * 0.86)]|min -%}
+  {%- set name_a = names[0] if names else "A" -%}
+  {%- set name_b = names[1] if names else "B" -%}
+  <header class="result__head result__head--couple">
+    <svg class="venn venn--live" viewBox="0 0 700 500" role="img"
+         aria-label="İki daire kesişiyor: pembe daire {{ name_a }}, mavi daire {{ name_b }}. Kesişimde uyum yüzde {{ score }}.">
+      <defs>
+        <pattern id="dot-pink" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(22)"><circle class="dot--pink" cx="4.5" cy="4.5" r="2.2"/></pattern>
+        <pattern id="dot-blue" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(-18)"><circle class="dot--blue" cx="4.5" cy="4.5" r="2.4"/></pattern>
+        <clipPath id="venn-clip-a"><circle cx="{{ '%.1f'|format(cx1) }}" cy="{{ cy }}" r="{{ r }}"/></clipPath>
+      </defs>
+      <g class="venn__inks">
+        <circle class="venn__halftone" cx="96" cy="96" r="66" fill="url(#dot-blue)"/>
+        <circle class="venn__halftone" cx="612" cy="420" r="74" fill="url(#dot-pink)"/>
+        <circle class="venn__a" cx="{{ '%.1f'|format(cx1) }}" cy="{{ cy }}" r="{{ r }}"/>
+        <circle class="venn__b" cx="{{ '%.1f'|format(cx2) }}" cy="{{ cy + 6 }}" r="{{ r }}"/>
+        {#- Koyu temada `screen` kesişimi açık çıkar; mor kesişimi bu katman basar. -#}
+        <circle class="venn__overlap" clip-path="url(#venn-clip-a)" cx="{{ '%.1f'|format(cx2) }}" cy="{{ cy + 6 }}" r="{{ r }}"/>
+        <circle class="venn__misprint" cx="{{ '%.1f'|format(cx1 + 6) }}" cy="{{ cy - 6 }}" r="{{ r }}"/>
+      </g>
+      <g class="venn__labels">
+        {{ lune_label(name_a, 350 - r, cy + 14, d, "venn__name venn__name--a") }}
+        {{ lune_label(name_b, 350 + r, cy + 20, d, "venn__name venn__name--b") }}
+        <text class="venn__score" x="350" y="{{ cy - 4 }}" text-anchor="middle" font-size="{{ '%.1f'|format(score_size) }}">{{ score_text }}</text>
+        <text class="venn__caption" x="350" y="{{ cy + 32 }}" text-anchor="middle">uyum</text>
+      </g>
+    </svg>
+    <div class="result__intro">
+      {% if display_name %}<p class="result__for">{{ display_name }}</p>{% endif %}
+      <h1 class="result__type" id="sonuc-baslik">İlişki uyumunuz</h1>
+      <p class="result__summary">{{ result.ozet }}</p>
+      <p class="ink-legend">
+        <span>{{ mark("pink") }}{{ name_a }}, pembe mürekkep</span>
+        <span>{{ mark("blue") }}{{ name_b }}, mavi mürekkep</span>
+      </p>
+    </div>
+  </header>
+
+  {% if result.eksenler_a and result.eksenler_b %}
+  <section class="axes axes--duo" aria-labelledby="eksenler">
+    <div class="section-head">
+      <h2 id="eksenler">Dört eksen üst üste</h2>
+      <p class="section-head__note">Mor bölge, iki çubuğun üst üste bindiği kısım.</p>
+    </div>
+    <ul class="axes__list">
+      {% for key, labels in axis_labels.items() %}
+      {% set value_a = result.eksenler_a[key] %}
+      {% set value_b = result.eksenler_b[key] %}
+      <li>
+        <p class="axes__label"><span>{{ labels[0] }}</span><span class="axes__pair">{{ name_a }} {{ value_a }}, {{ name_b }} {{ value_b }}<span class="visually-hidden"> (100 üzerinden)</span></span></p>
+        <svg class="bar bar--duo" aria-hidden="true" focusable="false">
+          <rect class="bar__track" x="0" y="0" width="100%" height="100%"/>
+          <rect class="bar__ink bar__ink--a" x="0" y="0" width="{{ value_a }}%" height="30"/>
+          <rect class="bar__ink bar__ink--b" x="0" y="14" width="{{ value_b }}%" height="30"/>
+          <rect class="bar__overlap" x="0" y="14" width="{{ [value_a, value_b]|min }}%" height="16"/>
+        </svg>
+        <p class="axes__poles"><span>{{ labels[1] }}</span><span>{{ labels[2] }}</span></p>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <div class="trio">
+    <section aria-labelledby="ortak">
+      <h2 class="tag tag--fill" id="ortak">Ortak yönleriniz</h2>
+      <ul class="marked">{% for item in result.ortak_yonler %}<li>{{ mark("overlap") }}<span>{{ item }}</span></li>{% endfor %}</ul>
+    </section>
+    <section aria-labelledby="farkli">
+      <h2 class="tag tag--line" id="farkli">Farklarınız</h2>
+      <ul class="marked">{% for item in result.farklar %}<li>{{ mark("apart") }}<span>{{ item }}</span></li>{% endfor %}</ul>
+    </section>
+    <section class="sticker" aria-labelledby="oneri">
+      <h2 id="oneri">İletişim önerisi</h2>
+      <p class="sticker__text">{{ result.iletisim_onerisi }}</p>
+    </section>
+  </div>
+
+  {% else %}
+  <header class="result__head result__head--single">
+    <div class="result__intro">
+      {% if display_name %}<p class="result__for">{{ display_name }}</p>{% endif %}
+      <h1 class="result__type" id="sonuc-baslik">{{ result.tip_adi }}</h1>
+      <p class="result__summary">{{ result.ozet }}</p>
+    </div>
+    <svg class="result__art" viewBox="0 0 480 420" aria-hidden="true" focusable="false">
+      <defs>
+        <pattern id="dot-blue" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(-18)"><circle class="dot--blue" cx="4.5" cy="4.5" r="2.4"/></pattern>
+      </defs>
+      <g class="venn__inks">
+        <circle class="venn__halftone" cx="392" cy="340" r="72" fill="url(#dot-blue)"/>
+        <circle class="venn__a" cx="230" cy="204" r="180"/>
+        <circle class="venn__misprint" cx="236" cy="198" r="180"/>
+      </g>
+      <text class="venn__name venn__name--a" x="230" y="236" text-anchor="middle" font-size="92">sen</text>
+    </svg>
+  </header>
+
+  <section class="axes" aria-labelledby="eksenler">
+    <div class="section-head">
+      <h2 id="eksenler">Dört eksende sen</h2>
+      <p class="section-head__note">Pembe çubuk senin puanın. İnce çizgi ortayı gösterir.</p>
+    </div>
+    <ul class="axes__list">
+      {% for key, labels in axis_labels.items() %}
+      {% set value = result.eksenler[key] %}
+      <li>
+        <p class="axes__label"><span>{{ labels[0] }}</span><span class="axes__value">{{ value }}<span class="visually-hidden"> / 100</span></span></p>
+        <svg class="bar" aria-hidden="true" focusable="false">
+          <rect class="bar__track" x="0" y="0" width="100%" height="100%"/>
+          <rect class="bar__ink" x="0" y="8" width="{{ value }}%" height="28"/>
+          <line class="bar__mid" x1="50%" y1="0" x2="50%" y2="100%"/>
+        </svg>
+        <p class="axes__poles"><span>{{ labels[1] }}</span><span>{{ labels[2] }}</span></p>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <div class="duo">
+    <section aria-labelledby="guclu">
+      <h2 class="tag tag--fill" id="guclu">Güçlü yönlerin</h2>
+      <ul class="marked">{% for item in result.guclu_yonler %}<li>{{ mark("one") }}<span>{{ item }}</span></li>{% endfor %}</ul>
+    </section>
+    <section aria-labelledby="gelisim">
+      <h2 class="tag tag--line" id="gelisim">Gelişim alanların</h2>
+      <ul class="marked">{% for item in result.gelisim_alanlari %}<li>{{ mark("ring") }}<span>{{ item }}</span></li>{% endfor %}</ul>
+    </section>
+  </div>
+  {% endif %}
+
+  <div class="result__actions">
+    <div class="btn-row">
+      {% if share_id %}
+        {% set page_url = url_for("main.shared_result", share_id=share_id, _external=True) %}
+        <button class="btn btn--primary share-only" type="button" data-share="{{ page_url }}" data-title="{{ page_title }}">{{ icon("share") }}<span>Paylaş</span></button>
+        <button class="btn" type="button" data-copy="{{ page_url }}" data-input="share-link" data-status="share-status">{{ icon("copy") }}<span>Bağlantıyı kopyala</span></button>
+        <a class="btn" href="{{ url_for('main.shared_image', share_id=share_id) }}" download="sonuc-{{ share_id }}.png">{{ icon("download") }}<span>Görseli indir</span></a>
+      {% endif %}
+      <a class="btn" href="{{ url_for('main.test_couple_start' if kind == 'couple' else 'main.test_single') }}">{{ icon("redo") }}<span>Testi yeniden çöz</span></a>
+      {% if share_id and owner %}
+      <form class="btn-row__end" method="post" action="{{ url_for('main.delete_result', share_id=share_id) }}" data-confirm="Sonuç kalıcı olarak silinsin mi? Bu işlem geri alınamaz.">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn--danger" type="submit">{{ icon("trash") }}<span>Sonucumu sil</span></button>
+      </form>
+      {% endif %}
+    </div>
+    {% if share_id %}
+    <label class="visually-hidden" for="share-link">Paylaşım bağlantısı</label>
+    <input class="visually-hidden" id="share-link" value="{{ url_for('main.shared_result', share_id=share_id, _external=True) }}" readonly tabindex="-1">
+    <p class="copy-status" id="share-status" role="status"></p>
+    {% else %}
+    <p class="notice mt-4" role="status">Sonuç şu an kaydedilemedi; bu yüzden paylaşım bağlantısı yok. Sayfayı kapatmadan önce ekran görüntüsü alabilirsin.</p>
+    {% endif %}
+    <p class="result__note">Eğlence amaçlıdır, klinik değerlendirme değildir.{% if share_id %} Bağlantıyı bilen herkes bu sonucu görebilir; sonuç {{ "7" if kind == "couple" else "30" }} gün sonra silinir.{% endif %}</p>
+  </div>
+</article>
+{% endblock %}

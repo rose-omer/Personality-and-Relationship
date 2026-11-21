@@ -1,0 +1,56 @@
+{%- from "_icons.html" import icon -%}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Kişilik ve İlişki Testi{% endblock %}</title>
+  <meta name="description" content="{% block description %}16 soruluk kişilik testi ve iki kişilik uyum testi. Cevaplarını Google Gemini yorumlar.{% endblock %}">
+  <meta name="theme-color" content="#ECEDE9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#181D42" media="(prefers-color-scheme: dark)">
+  {% block meta %}{% endblock %}
+  <link rel="preload" href="{{ url_for('static', filename='fonts/unbounded-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{{ url_for('static', filename='fonts/rubik-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <script src="{{ url_for('static', filename='theme.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <a class="skip-link" href="#icerik">İçeriğe geç</a>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="wordmark" href="{{ url_for('main.index') }}">
+        <svg class="wordmark__mark" width="34" height="22" viewBox="0 0 34 22" aria-hidden="true" focusable="false"><circle class="mark__pink" cx="11" cy="11" r="10"/><circle class="mark__blue mark__blend" cx="23" cy="11" r="10"/></svg>
+        <span>Kişilik ve İlişki Testi</span>
+      </a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Koyu temaya geç">
+        <span class="theme-toggle__icon theme-toggle__icon--moon">{{ icon("moon") }}</span>
+        <span class="theme-toggle__icon theme-toggle__icon--sun">{{ icon("sun") }}</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="icerik" class="{% block main_class %}wrap{% endblock %}" tabindex="-1">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="notice" role="status">
+          {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="site-footer__inner">
+        <p>{% block footer_note %}Eğlence amaçlıdır, klinik değerlendirme değildir.{% endblock %}</p>
+        <nav aria-label="Alt bağlantılar">
+          <a href="{{ url_for('main.privacy') }}">Gizlilik ve aydınlatma metni</a>
+          <a href="https://github.com/rose-omer/Personality-and-Relationship">Kaynak kod</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

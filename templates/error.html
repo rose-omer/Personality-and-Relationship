@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · Kişilik ve İlişki{% endblock %}
+{% block meta %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<div class="error-page">
+  <p class="misprint" aria-hidden="true"><span class="misprint__a">{{ code }}</span><span class="misprint__b">{{ code }}</span></p>
+  <p class="error-page__code">Hata {{ code }}</p>
+  <h1>{{ title }}</h1>
+  <p class="lead mt-4">{{ message }}</p>
+  <div class="btn-row">
+    {% if code == 429 %}
+      <a class="btn btn--primary" href="{{ url_for('main.index') }}">Ana sayfaya dön</a>
+    {% else %}
+      <a class="btn btn--primary" href="{{ url_for('main.test_single') }}">Yeni test başlat</a>
+      <a class="btn" href="{{ url_for('main.index') }}">Ana sayfaya dön</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
